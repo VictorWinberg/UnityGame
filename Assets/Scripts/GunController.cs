@@ -5,7 +5,7 @@ public class GunController : MonoBehaviour {
 
 	public Transform weaponHold;
 	public Gun startingGun;
-	private Gun gun;
+	Gun gun;
 
 	void Start() {
 		if (startingGun != null) {
@@ -13,11 +13,11 @@ public class GunController : MonoBehaviour {
 		}
 	}
 
-	public void EquipGun(Gun newGun) {
+	public void EquipGun(Gun gunToEquip) {
 		if (gun != null) {
-			Destroy(gun);
+			Destroy(gun.gameObject);
 		}
-		gun = Instantiate (newGun, weaponHold.position, weaponHold.rotation) as Gun;
+		gun = Instantiate (gunToEquip, weaponHold.position,weaponHold.rotation) as Gun;
 		gun.transform.parent = weaponHold;
 	}
 

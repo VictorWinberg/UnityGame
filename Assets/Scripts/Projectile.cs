@@ -13,14 +13,14 @@ public class Projectile : MonoBehaviour {
 
 	void Update () {
 		// Movement
-		transform.Translate (Vector3.forward * Time.deltaTime * speed);
+		float moveDistance = speed * Time.deltaTime;
+		transform.Translate (Vector3.forward * moveDistance);
 
 		// Collision Detection
-		float moveDistance = speed * Time.deltaTime;
-		CheckCollision (moveDistance);
+		CheckCollisions (moveDistance);
 	}
 
-	void CheckCollision (float moveDistance){
+	void CheckCollisions (float moveDistance) {
 		Ray ray = new Ray (transform.position, transform.forward);
 		RaycastHit hit;
 

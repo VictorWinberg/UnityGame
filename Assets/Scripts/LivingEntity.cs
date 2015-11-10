@@ -3,14 +3,14 @@ using System.Collections;
 
 public class LivingEntity : MonoBehaviour, IDamageable {
 
-	public float startHealth = 3;
+	public float startingHealth = 2;
 	protected float health;
 	protected bool dead;
 
 	public event System.Action OnDeath;
 
 	protected virtual void Start() {
-		health = startHealth;
+		health = startingHealth;
 	}
 
 	public void TakeHit (float damage, RaycastHit hit){
