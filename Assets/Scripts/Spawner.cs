@@ -9,8 +9,7 @@ public class Spawner : MonoBehaviour {
 	Wave currentWave;
 	int currentWaveNumber;
 
-	int enemiesRemainingToSpawn;
-	int enemiesRemainingAlive;
+	int enemiesRemainingToSpawn, enemiesRemainingAlive;
 	float nextSpawnTime; 
 
 	void Start () {

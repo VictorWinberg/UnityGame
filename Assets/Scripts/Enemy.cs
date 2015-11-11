@@ -18,9 +18,7 @@ public class Enemy : LivingEntity {
 	float timeBetweenAttacks = 1;
 	float damage = 1;
 	
-	float nextAttackTime;
-	float myCollisionRadius;
-	float targetCollisionRadius;
+	float nextAttackTime, myCollisionRadius, targetCollisionRadius;
 
 	bool hasTarget;
 	

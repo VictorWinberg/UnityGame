@@ -4,11 +4,9 @@ using System.Collections;
 public class Projectile : MonoBehaviour {
 
 	public LayerMask collisionMask;
-	float speed = 10;
-	float damage = 1;
+	float speed = 10, damage = 1;
 
-	float lifetime = 3;
-	float skinWidth = .1f;
+	float lifetime = 3, skinWidth = .1f;
 
 	void Start() {
 		Destroy (gameObject, lifetime);
