@@ -2,12 +2,11 @@
 using System.Collections;
 using System.Collections.Generic;
 
-[RequireComponent (typeof (BoxCollider))]
 public class MapGenerator : MonoBehaviour {
 	public Map[] maps;
 	public int mapIndex;
 
-	public Transform tilePrefab, obstaclePrefab, navmeshFloor, navmeshMaskPrefab;
+	public Transform tilePrefab, obstaclePrefab, mapFloor, navmeshFloor, navmeshMaskPrefab;
 	public Vector2 maxMapSize;
 
 	[Range(0,1)]
@@ -34,7 +33,6 @@ public class MapGenerator : MonoBehaviour {
 		currentMap = maps [mapIndex];
 		tileMap = new Transform[currentMap.mapSize.x, currentMap.mapSize.y];
 		System.Random r = new System.Random (currentMap.seed);
-		GetComponent<BoxCollider>().size = new Vector3 (currentMap.mapSize.x * tileSize, 0.05f, currentMap.mapSize.y * tileSize);
 
 		// Generating coords
 		tileCoords = new List<Coord> ();
@@ -118,6 +116,7 @@ public class MapGenerator : MonoBehaviour {
 		maskBottom.localScale = new Vector3 (maxMapSize.x, 1, (maxMapSize.y - currentMap.mapSize.y) / 2f) * tileSize;
 		
 		navmeshFloor.localScale = new Vector3 (maxMapSize.x, maxMapSize.y) * tileSize;
+		mapFloor.localScale = new Vector3 (currentMap.mapSize.x * tileSize, currentMap.mapSize.y * tileSize, 0.05f); 
 	}
 
 	/** Flood-fill algorithm*/
