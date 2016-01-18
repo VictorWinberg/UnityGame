@@ -4,6 +4,7 @@ using System.Collections;
 public class Projectile : MonoBehaviour {
 
 	public LayerMask collisionMask;
+	public Color trailColor;
 	float speed = 10, damage = 1;
 
 	float lifetime = 3, skinWidth = .1f;
@@ -15,6 +16,8 @@ public class Projectile : MonoBehaviour {
 		if (initialCollision.Length > 0) {
 			OnHitObject(initialCollision[0], transform.position);
 		}
+
+		GetComponent<TrailRenderer> ().material.SetColor ("_TintColor", trailColor);
 	}
 
 	public void SetSpeed(float speed) {

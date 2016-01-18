@@ -91,12 +91,11 @@ public class Spawner : MonoBehaviour {
 	}
 
 	void ResetPlayerPosition() {
-		player.transform.position = map.getTileFromPosition(Vector3.zero).position + Vector3.up;
+		player.transform.position = map.getTileFromPosition(Vector3.zero).position + Vector3.up * 3;
 	}
 
 	void NextWave() {
 		currentWaveNumber++;
-		print ("Wave: " + currentWaveNumber);
 		if (currentWaveNumber - 1 < waves.Length) {
 			currentWave = waves [currentWaveNumber - 1];
 			
