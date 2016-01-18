@@ -91,7 +91,7 @@ public class Spawner : MonoBehaviour {
 	}
 
 	void ResetPlayerPosition() {
-		player.transform.position = map.getTileFromPosition(Vector3.zero).position + Vector3.up * 2;
+		player.transform.position = map.getTileFromPosition(Vector3.zero).position + Vector3.up;
 	}
 
 	void NextWave() {
