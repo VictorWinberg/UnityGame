@@ -41,19 +41,30 @@ public class FieldOfView : MonoBehaviour {
 	}
 
 	void FindVisibleTargets() {
+		HideTargets (visibleTargets);
 		visibleTargets.Clear ();
 		Collider[] targetsInViewRadius = Physics.OverlapSphere (transform.position, viewRadius, targetMask);
 
 		for (int i = 0; i < targetsInViewRadius.Length; i++) {
 			Transform target = targetsInViewRadius [i].transform;
 			Vector3 directionToTarget = (target.position - transform.position).normalized;
+
 			if (Vector3.Angle (transform.forward, directionToTarget) < viewAngle / 2) {
 				float distanceToTarget = Vector3.Distance (transform.position, target.position);
 
-				if(!Physics.Raycast(transform.position, directionToTarget, distanceToTarget, obstacleMask)) {
+				Vector3 directionToTargetWithMargin = (target.position + target.GetComponent<NavMeshAgent>().desiredVelocity.normalized * 1.5f - transform.position).normalized;
+				if(!Physics.Raycast(transform.position, directionToTargetWithMargin, distanceToTarget, obstacleMask) || !Physics.Raycast(transform.position, directionToTarget, distanceToTarget, obstacleMask)) {
 					visibleTargets.Add (target);
+					target.GetComponent<Renderer> ().enabled = true;
 				}
 			}
+		}
+	}
+
+	void HideTargets (List<Transform> targets) {
+		foreach (Transform target in targets) {
+			if(target != null)
+				target.GetComponent<Renderer> ().enabled = false;
 		}
 	}
 
@@ -67,8 +78,8 @@ public class FieldOfView : MonoBehaviour {
 			ViewCastInfo newViewCast = ViewCast (angle);
 
 			if (i > 0) {
-				bool edgeDstThresholdExceeded = Mathf.Abs (oldViewCast.distance - newViewCast.distance) > edgeDistanceThreshold;
-				if (oldViewCast.hit != newViewCast.hit || (oldViewCast.hit && newViewCast.hit && edgeDstThresholdExceeded)) {
+				bool edgeDistanceThresholdExceeded = Mathf.Abs (oldViewCast.distance - newViewCast.distance) > edgeDistanceThreshold;
+				if (oldViewCast.hit != newViewCast.hit || (oldViewCast.hit && newViewCast.hit && edgeDistanceThresholdExceeded)) {
 					EdgeInfo edge = FindEdge (oldViewCast, newViewCast);
 					if (edge.pointA != Vector3.zero) {
 						viewPoints.Add (edge.pointA);
