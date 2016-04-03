@@ -15,6 +15,10 @@ public class Player : LivingEntity {
 
 	public bool aimbot = false;
 
+	public Player Create() {
+		return ((GameObject)Instantiate (Resources.Load ("Player"), Vector3.up, Quaternion.identity)).GetComponent<Player> ();
+	}
+
 	void Awake() {
 		controller = GetComponent<PlayerController> ();
 		gunController = GetComponent<GunController> ();

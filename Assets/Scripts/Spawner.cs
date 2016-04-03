@@ -29,7 +29,8 @@ public class Spawner : MonoBehaviour {
 	public event System.Action<int> OnNewWave;
 
 	void Start () {
-		player = FindObjectOfType<Player> ();
+		if(player == null)
+			player = FindObjectOfType<Player> ();
 
 		nextIdleTimeCheck = idleTimeCheck + Time.time;
 		idlePositionPrevious = player.transform.position;
@@ -37,6 +38,13 @@ public class Spawner : MonoBehaviour {
 
 		map = FindObjectOfType<MapGenerator> ();
 		NextWave ();
+	}
+
+	public Player setPlayer {
+		set 
+		{
+			player = value; 
+		}
 	}
 
 	void Update () {

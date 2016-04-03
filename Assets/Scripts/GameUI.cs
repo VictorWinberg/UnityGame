@@ -21,6 +21,10 @@ public class GameUI : MonoBehaviour {
 		FindObjectOfType<Player> ().OnDeath += OnGameOver;
 	}
 
+	public GameUI Create() {
+		return ((GameObject)Instantiate(Resources.Load("Canvas"), Vector3.zero, Quaternion.identity)).GetComponent<GameUI>();
+	}
+
 	void OnNewWave(int waveNumber) {
 		waveTitle.text = "- Wave " + HumanFriendlyInteger.IntegerToWritten (waveNumber) + " -";
 		string enemyCount = (spawner.waves [waveNumber - 1].infinite) ? "Infinite" : spawner.waves [waveNumber - 1].enemyCount + "";
