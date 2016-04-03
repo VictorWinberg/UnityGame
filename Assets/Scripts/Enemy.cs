@@ -56,7 +56,7 @@ public class Enemy : LivingEntity {
 		if (hasTarget) this.damage = damage;
 		startingHealth = health;
 
-		skinMaterial = GetComponent<Renderer> ().material;
+		skinMaterial = GetComponent<Renderer> ().sharedMaterial;
 		skinMaterial.color = skinColor;
 		originalColour = skinMaterial.color;
 	}

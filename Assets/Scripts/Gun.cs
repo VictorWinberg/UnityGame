@@ -64,19 +64,14 @@ public class Gun : MonoBehaviour {
 					return;
 			}
 
-			/*for (int i = 0; i < projectileSpawns.Length; i++) {
+			for (int i = 0; i < projectileSpawns.Length; i++) {
 				if(bulletsRemainingInMag == 0)
 					break;
+				bulletsRemainingInMag--;
 				nextShotTime = Time.time + msBetweenShots / 1000;
 				Projectile newProjectile = Instantiate (projectile, projectileSpawns[i].position, projectileSpawns[i].rotation) as Projectile;
 				newProjectile.SetSpeed (muzzleVelocity);
-				bulletsRemainingInMag--;
-			}*/
-			Transform projectileSpawn = projectileSpawns[Random.Range(0, projectileSpawns.Length)];
-			nextShotTime = Time.time + msBetweenShots / 1000;
-			Projectile newProjectile = Instantiate (projectile, projectileSpawn.position, projectileSpawn.rotation) as Projectile;
-			newProjectile.SetSpeed (muzzleVelocity);
-			bulletsRemainingInMag--;
+			}
 
 			Instantiate(shell, shellEjection.position, shellEjection.rotation);
 			muzzleflash.Activate();

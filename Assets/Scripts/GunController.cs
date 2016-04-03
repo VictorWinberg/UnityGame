@@ -4,13 +4,11 @@ using System.Collections;
 public class GunController : MonoBehaviour {
 
 	public Transform weaponHold;
-	public Gun startingGun;
+	public Gun[] guns;
 	Gun gun;
 
 	void Start() {
-		if (startingGun != null) {
-			EquipGun(startingGun);
-		}
+
 	}
 
 	public void EquipGun(Gun gunToEquip) {
@@ -19,6 +17,10 @@ public class GunController : MonoBehaviour {
 		}
 		gun = Instantiate (gunToEquip, weaponHold.position,weaponHold.rotation) as Gun;
 		gun.transform.parent = weaponHold;
+	}
+
+	public void EquipGun(int gunIndex) {
+		EquipGun (guns[gunIndex]);
 	}
 
 	public void OnTriggerHold (){
