@@ -74,7 +74,7 @@ public class Spawner : MonoBehaviour {
 
 		Transform spawnTile = isIdle ? map.getTileFromPosition(player.transform.position) : map.getRandomOpenTile ();
 		Material tileMaterial = spawnTile.GetComponent<Renderer> ().material;
-		Color initialColor = tileMaterial.color;
+		Color initialColor = map.getInitialTileColor ();
 		Color flashColor = Color.red;
 		float spawnTimer = 0;
 
@@ -85,7 +85,7 @@ public class Spawner : MonoBehaviour {
 			spawnTimer += Time.deltaTime;
 			yield return null;
 		}
-
+		tileMaterial.color = initialColor;
 		Enemy spawnedEnemy = Instantiate(enemy, spawnTile.position + Vector3.up, Quaternion.identity) as Enemy;
 		spawnedEnemy.OnDeath += OnEnemyDeath;
 

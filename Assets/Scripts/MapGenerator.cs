@@ -176,6 +176,11 @@ public class MapGenerator : MonoBehaviour {
 		return tileMap [randomCoord.x, randomCoord.y];
 	}
 
+	public Color getInitialTileColor() {
+		return tilePrefab.GetComponent<Renderer> ().sharedMaterial.color;
+		//return tileMap [0, 0].GetComponent<Renderer> ().material.color;
+	}
+
 	[System.Serializable]
 	public struct Coord {
 		public int x, y;
