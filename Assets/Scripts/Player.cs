@@ -11,6 +11,8 @@ public class Player : LivingEntity {
 	PlayerController controller;
 	GunController gunController;
 
+	public bool aimbot = false;
+
 	protected override void Start () {
 		base.Start ();
 		controller = GetComponent<PlayerController> ();
@@ -28,15 +30,30 @@ public class Player : LivingEntity {
 		Ray ray = viewCamera.ScreenPointToRay (Input.mousePosition);
 		Plane groundPlane = new Plane (Vector3.up, Vector3.zero);
 		float rayDistance;
+		Vector3 point = Vector3.zero;
 
 		if (groundPlane.Raycast(ray,out rayDistance)) {
-			Vector3 point = ray.GetPoint(rayDistance);
+			point = ray.GetPoint(rayDistance);
 			//Debug.DrawLine(ray.origin,point,Color.red);
 			controller.LookAt(point);
 		}
 
 		// Weapon input
 		if (Input.GetMouseButton(0)) {
+			if (aimbot) {
+				// Look input
+				int enemyLayer = 1 << LayerMask.NameToLayer("Enemy");
+				float minDist = Mathf.Infinity;
+				Vector3 closest = point;
+				foreach (Collider hit in Physics.OverlapSphere(transform.position, 10f, enemyLayer)) {
+					float dist = Vector3.Distance (hit.transform.position, transform.position);
+					if (dist < minDist) {
+						minDist = dist;
+						closest = hit.transform.position;
+					}
+				}
+				controller.LookAt (closest);
+			}
 			gunController.OnTriggerHold();
 		}
 		if (Input.GetMouseButtonUp(0)) {
