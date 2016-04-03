@@ -37,6 +37,17 @@ public class GunController : MonoBehaviour {
 		get {
 			return weaponHold.position.y;
 		}
+	}
 
+	public void Aim(Vector3 aimPoint) {
+		if (gun != null) {
+			gun.Aim (aimPoint);
+		}
+	}
+
+	public void Reload() {
+		if (gun != null) {
+			gun.Reload ();
+		}
 	}
 }

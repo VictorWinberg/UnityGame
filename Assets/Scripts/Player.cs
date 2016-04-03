@@ -22,50 +22,54 @@ public class Player : LivingEntity {
 		viewCamera = Camera.main;
 	}
 
+	void LookAtTarget (Vector3 point) {
+		controller.LookAt (point);
+		crosshairs.transform.position = point;
+		if((new Vector2(point.x, point.z) - new Vector2(transform.position.x, transform.position.z)).sqrMagnitude > 1)
+			gunController.Aim (point);
+	}
+
 	void Update () {
 		// Movement input
 		Vector3 moveInput = new Vector3 (Input.GetAxisRaw ("Horizontal"), 0, Input.GetAxisRaw ("Vertical"));
 		Vector3 moveVelocity = moveInput.normalized * moveSpeed;
 		controller.Move (moveVelocity);
 
-		// Look input
 		Ray ray = viewCamera.ScreenPointToRay (Input.mousePosition);
 		Plane groundPlane = new Plane (Vector3.up, Vector3.up * gunController.GunHeight);
 		float rayDistance;
 		Vector3 point = Vector3.zero;
-
-		if (groundPlane.Raycast(ray,out rayDistance)) {
-			point = ray.GetPoint(rayDistance);
+		if (groundPlane.Raycast (ray, out rayDistance)) {
+			point = ray.GetPoint (rayDistance);
 			//Debug.DrawLine(ray.origin,point,Color.red);
-			controller.LookAt(point);
-			crosshairs.transform.position = point;
-			crosshairs.DetectTargets(ray);
+			crosshairs.DetectTargets (ray);
+			LookAtTarget (point);
 		}
 
 		// Weapon input
 		if (Input.GetMouseButton(0)) {
 			if (aimbot) {
 				// Look input
-				int enemyLayer = 1 << LayerMask.NameToLayer("Enemy");
+				int enemyLayer = 1 << LayerMask.NameToLayer ("Enemy");
 				float minDist = Mathf.Infinity;
 				Vector3 closest = point;
-				foreach (Collider hit in Physics.OverlapSphere(transform.position, 10f, enemyLayer)) {
+				foreach (Collider hit in Physics.OverlapSphere (transform.position, 10f, enemyLayer)) {
 					float dist = Vector3.Distance (hit.transform.position, transform.position);
 					if (dist < minDist) {
 						minDist = dist;
 						closest = hit.transform.position;
 					}
 				}
-				controller.LookAt (closest);
-				crosshairs.transform.position = closest;
-				if(!closest.Equals(point)) {
-					crosshairs.DetectTargets(true);
-				}
+				crosshairs.DetectTargets (!point.Equals (closest));
+				LookAtTarget (closest);
 			}
 			gunController.OnTriggerHold();
 		}
 		if (Input.GetMouseButtonUp(0)) {
 			gunController.OnTriggerRelease();
+		}
+		if (Input.GetKeyDown (KeyCode.R)) {
+			gunController.Reload();
 		}
 	}
 }
