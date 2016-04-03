@@ -28,6 +28,27 @@ public class Spawner : MonoBehaviour {
 
 	public event System.Action<int> OnNewWave;
 
+	public Spawner Create(Enemy enemy) {
+		GameObject go = new GameObject ();
+		go.name = "Spawner";
+		Spawner spawner = go.AddComponent<Spawner> ();
+		spawner.enemy = enemy;
+		spawner.developerMode = true;
+		Wave[] myWaves = new Wave[5];
+		for (int i = 0; i < myWaves.Length; i++) {
+			myWaves [i] = new Wave ();
+			myWaves[i].enemyCount = 10;
+			myWaves[i].timeBetweenSpawns = .2f;
+
+			myWaves[i].moveSpeed = 3;
+			myWaves[i].damage = 3;
+			myWaves[i].health = 2f;
+			myWaves[i].skinColor = Color.black;
+		}
+		spawner.waves = myWaves;
+		return spawner;
+	}
+
 	void Start () {
 		if(player == null)
 			player = FindObjectOfType<Player> ();

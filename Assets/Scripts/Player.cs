@@ -23,11 +23,11 @@ public class Player : LivingEntity {
 		controller = GetComponent<PlayerController> ();
 		gunController = GetComponent<GunController> ();
 		viewCamera = Camera.main;
-		FindObjectOfType<Spawner> ().OnNewWave += OnNewWave;
 	}
 
 	protected override void Start () {
 		base.Start ();
+		FindObjectOfType<Spawner> ().OnNewWave += OnNewWave;
 	}
 
 	void OnNewWave(int waveNumber) {
