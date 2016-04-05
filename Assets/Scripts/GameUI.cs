@@ -10,6 +10,8 @@ public class GameUI : MonoBehaviour {
 	public RectTransform waveBanner;
 	public Text waveTitle, waveEnemyCount;
 
+	private GameManager manager;
+
 	Spawner spawner;
 
 	void Awake() {
@@ -21,13 +23,16 @@ public class GameUI : MonoBehaviour {
 		FindObjectOfType<Player> ().OnDeath += OnGameOver;
 	}
 
-	public GameUI Create() {
-		return ((GameObject)Instantiate(Resources.Load("Canvas"), Vector3.zero, Quaternion.identity)).GetComponent<GameUI>();
+	public GameUI Create(GameManager manager) {
+		GameUI gui = ((GameObject)Instantiate(Resources.Load("Canvas"), Vector3.zero, Quaternion.identity)).GetComponent<GameUI>();
+		gui.manager = manager;
+		return gui;
 	}
 
 	void OnNewWave(int waveNumber) {
 		waveTitle.text = "- Wave " + HumanFriendlyInteger.IntegerToWritten (waveNumber) + " -";
 		string enemyCount = (spawner.waves [waveNumber - 1].infinite) ? "Infinite" : spawner.waves [waveNumber - 1].enemyCount + "";
+		enemyCount += " | Health: " + (int)(manager.getPlayer ().getHealth ()) + " | Mode: " + manager.getPlayer ().getGun ().fireMode;
 		waveEnemyCount.text = "Enemies: " + enemyCount;
 		StopCoroutine ("AnimateWaveBanner");
 		StartCoroutine ("AnimateWaveBanner");
@@ -74,6 +79,6 @@ public class GameUI : MonoBehaviour {
 
 	// UI Input
 	public void StartNewGame() {
-		Application.LoadLevel ("Scene1");
+		Application.LoadLevel ("Scene2");
 	}
 }

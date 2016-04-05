@@ -3,6 +3,8 @@ using System.Collections;
 
 public class GameManager : MonoBehaviour {
 
+	public static int waves = 30;
+
 	private GameObject camera;
 	private MapGenerator map;
 	private Crosshairs crosshairs;
@@ -21,14 +23,18 @@ public class GameManager : MonoBehaviour {
 		spawner.setPlayer = player;
 		map = MapGenerator.Create(spawner);
 		map.GenerateMap ();
-		canvas = new GameUI ().Create ();
 	}
 
 	void Start () {
 		player.aimbot = false;
+		canvas = new GameUI ().Create (this);
 	}
 	
 	void Update () {
 
+	}
+
+	public Player getPlayer() {
+		return player;
 	}
 }

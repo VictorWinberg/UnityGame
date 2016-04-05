@@ -83,4 +83,8 @@ public class Player : LivingEntity {
 			gunController.Reload();
 		}
 	}
+
+	public Gun getGun() {
+		return gunController.getGun ();
+	}
 }

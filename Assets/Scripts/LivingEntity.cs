@@ -26,6 +26,10 @@ public class LivingEntity : MonoBehaviour, IDamageable {
 		}
 	}
 
+	public float getHealth() {
+		return health;
+	}
+
 	[ContextMenu("Self Destruct")]
 	protected void Die (){
 		dead = true;

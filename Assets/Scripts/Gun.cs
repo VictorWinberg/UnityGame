@@ -122,5 +122,4 @@ public class Gun : MonoBehaviour {
 		if(!reloading)
 			transform.LookAt (aimPoint);
 	}
-
 }

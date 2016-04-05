@@ -51,15 +51,15 @@ public class MapGenerator : MonoBehaviour {
 		Destroy (navmeshFloor.gameObject.GetComponent<MeshCollider> ());
 		generator.navmeshFloor = navmeshFloor.transform;
 
-		int myMapSize = 10;
+		int myMapSize = GameManager.waves;
 		Map[] myMaps = new Map[myMapSize];
 		for (int i = 0; i < myMapSize; i++) {
 			myMaps[i] = new Map();
 			myMaps[i].mapSize = new Coord((int)Random.Range(8, 14), (int)Random.Range(8, 14));
-			myMaps[i].obstaclePercent = Random.Range(0f, 1f);
+			myMaps[i].obstaclePercent = Random.Range(0f, 5f * Mathf.Log(i+3) / myMapSize);
 			System.Random rand = new System.Random();
 			myMaps[i].seed = rand.Next();
-			myMaps[i].minObstacleHeight = Random.Range(0.2f, 2f);
+			myMaps[i].minObstacleHeight = Random.Range(0.2f, 1f);
 			myMaps[i].maxObstacleHeight = myMaps[i].minObstacleHeight + Random.Range(0.2f, 3f);
 			myMaps[i].foregroundColor = new Color(Random.Range(0,1f),Random.Range(0,1f),Random.Range(0,1f));
 			myMaps[i].backgroundColor = new Color(Random.Range(0,1f),Random.Range(0,1f),Random.Range(0,1f));
@@ -163,25 +163,25 @@ public class MapGenerator : MonoBehaviour {
 		// Creating walls
 		Transform wallWest = new GameObject ("Wall(Clone)").transform;
 		BoxCollider coll = wallWest.gameObject.AddComponent<BoxCollider> ();
-		coll.size = new Vector3 (1, 10, currentMap.mapSize.y * tileSize);
+		coll.size = new Vector3 (1, 10, (currentMap.mapSize.y + .5f) * tileSize);
 		wallWest.position = Vector3.left * currentMap.mapSize.x / 2f * tileSize + Vector3.up * (coll.size.y / 2f - .1f);
 		wallWest.parent = mapHolder;
 
 		Transform wallEast = new GameObject ("Wall(Clone)").transform;
 		coll = wallEast.gameObject.AddComponent<BoxCollider> ();
-		coll.size = new Vector3 (1, 10, currentMap.mapSize.y * tileSize);
+		coll.size = new Vector3 (1, 10, (currentMap.mapSize.y + .5f) * tileSize);
 		wallEast.position = Vector3.right * currentMap.mapSize.x / 2f * tileSize + Vector3.up * (coll.size.y / 2f - .1f);
 		wallEast.parent = mapHolder;
 
 		Transform wallNorth = new GameObject ("Wall(Clone)").transform;
 		coll = wallNorth.gameObject.AddComponent<BoxCollider> ();
-		coll.size = new Vector3 (currentMap.mapSize.x * tileSize, 10, 1);
+		coll.size = new Vector3 ((currentMap.mapSize.x + .5f) * tileSize, 10, 1);
 		wallNorth.position = Vector3.forward * currentMap.mapSize.y / 2f * tileSize + Vector3.up * (coll.size.y / 2f - .1f);
 		wallNorth.parent = mapHolder;
 
 		Transform wallSouth = new GameObject ("Wall(Clone)").transform;
 		coll = wallSouth.gameObject.AddComponent<BoxCollider> ();
-		coll.size = new Vector3 (currentMap.mapSize.x * tileSize, 10, 1);
+		coll.size = new Vector3 ((currentMap.mapSize.x + .5f) * tileSize, 10, 1);
 		wallSouth.position = Vector3.back * currentMap.mapSize.y / 2f * tileSize + Vector3.up * (coll.size.y / 2f - .1f);
 		wallSouth.parent = mapHolder;
 
