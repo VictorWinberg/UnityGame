@@ -15,14 +15,12 @@ public class Player : LivingEntity {
 
 	public bool aimbot = false;
 
-	public Player Create() {
-		return ((GameObject)Instantiate (Resources.Load ("Player"), Vector3.up, Quaternion.identity)).GetComponent<Player> ();
-	}
-
-	void Awake() {
-		controller = GetComponent<PlayerController> ();
-		gunController = GetComponent<GunController> ();
-		viewCamera = Camera.main;
+	public static Player Create() {
+		Player player = ((GameObject)Instantiate (Resources.Load ("Player"), Vector3.up, Quaternion.identity)).GetComponent<Player> ();
+		player.controller = player.gameObject.GetComponent<PlayerController> ();
+		player.gunController = player.gameObject.GetComponent<GunController> ();
+		player.viewCamera = Camera.main;
+		return player;
 	}
 
 	protected override void Start () {

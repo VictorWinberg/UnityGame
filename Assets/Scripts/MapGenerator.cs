@@ -20,8 +20,53 @@ public class MapGenerator : MonoBehaviour {
 
 	Map currentMap;
 
-	void Awake() {
-		FindObjectOfType<Spawner> ().OnNewWave += OnNewWave;
+	public static MapGenerator Create(Spawner spawner) {
+		MapGenerator generator = new GameObject ("Map").AddComponent<MapGenerator> ();
+		generator.tilePrefab = ((GameObject)Resources.Load ("Tile")).transform;
+		generator.obstaclePrefab = ((GameObject)Resources.Load ("Obstacle")).transform;
+		generator.navmeshMaskPrefab = ((GameObject)Resources.Load ("Navmesh Mask")).transform;
+		generator.maxMapSize = new Vector2 (40, 40);
+		generator.mapIndex = 0;
+		generator.outlinePercent = .1f;
+		generator.tileSize = 1.5f;
+
+		Transform mapFloor = GameObject.CreatePrimitive (PrimitiveType.Quad).transform;
+		mapFloor.name = "Map Floor";
+		mapFloor.parent = generator.transform;
+		mapFloor.position = new Vector3 (0, -.1f, 0);
+		mapFloor.rotation = Quaternion.AngleAxis (90f, Vector3.right);
+		mapFloor.gameObject.isStatic = false;
+		mapFloor.gameObject.AddComponent<BoxCollider> ();
+		Destroy (mapFloor.gameObject.GetComponent<MeshCollider> ());
+		mapFloor.GetComponent<Renderer> ().material = (Material)Resources.Load ("NavySmooth");
+		generator.mapFloor = mapFloor;
+
+		Transform navmeshFloor = GameObject.CreatePrimitive (PrimitiveType.Quad).transform;
+		navmeshFloor.name = "Navmesh Floor";
+		navmeshFloor.parent = generator.transform;
+		navmeshFloor.localScale = new Vector3 (60, 60, 60);
+		navmeshFloor.rotation = Quaternion.AngleAxis (90f, Vector3.right);
+		navmeshFloor.gameObject.isStatic = true;
+		navmeshFloor.GetComponent<MeshRenderer> ().shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.ShadowsOnly;
+		Destroy (navmeshFloor.gameObject.GetComponent<MeshCollider> ());
+		generator.navmeshFloor = navmeshFloor.transform;
+
+		int myMapSize = 10;
+		Map[] myMaps = new Map[myMapSize];
+		for (int i = 0; i < myMapSize; i++) {
+			myMaps[i] = new Map();
+			myMaps[i].mapSize = new Coord((int)Random.Range(8, 14), (int)Random.Range(8, 14));
+			myMaps[i].obstaclePercent = Random.Range(0f, 1f);
+			System.Random rand = new System.Random();
+			myMaps[i].seed = rand.Next();
+			myMaps[i].minObstacleHeight = Random.Range(0.2f, 2f);
+			myMaps[i].maxObstacleHeight = myMaps[i].minObstacleHeight + Random.Range(0.2f, 3f);
+			myMaps[i].foregroundColor = new Color(Random.Range(0,1f),Random.Range(0,1f),Random.Range(0,1f));
+			myMaps[i].backgroundColor = new Color(Random.Range(0,1f),Random.Range(0,1f),Random.Range(0,1f));
+		}
+		generator.maps = myMaps;
+		spawner.OnNewWave += generator.OnNewWave;
+		return generator;
 	}
 
 	void OnNewWave(int waveNumber) {
@@ -114,7 +159,32 @@ public class MapGenerator : MonoBehaviour {
 		Transform maskBottom = Instantiate (navmeshMaskPrefab, Vector3.back * (currentMap.mapSize.y + maxMapSize.y) / 4f * tileSize, Quaternion.identity) as Transform;
 		maskBottom.parent = mapHolder;
 		maskBottom.localScale = new Vector3 (maxMapSize.x, 1, (maxMapSize.y - currentMap.mapSize.y) / 2f) * tileSize;
-		
+
+		// Creating walls
+		Transform wallWest = new GameObject ("Wall(Clone)").transform;
+		BoxCollider coll = wallWest.gameObject.AddComponent<BoxCollider> ();
+		coll.size = new Vector3 (1, 10, currentMap.mapSize.y * tileSize);
+		wallWest.position = Vector3.left * currentMap.mapSize.x / 2f * tileSize + Vector3.up * (coll.size.y / 2f - .1f);
+		wallWest.parent = mapHolder;
+
+		Transform wallEast = new GameObject ("Wall(Clone)").transform;
+		coll = wallEast.gameObject.AddComponent<BoxCollider> ();
+		coll.size = new Vector3 (1, 10, currentMap.mapSize.y * tileSize);
+		wallEast.position = Vector3.right * currentMap.mapSize.x / 2f * tileSize + Vector3.up * (coll.size.y / 2f - .1f);
+		wallEast.parent = mapHolder;
+
+		Transform wallNorth = new GameObject ("Wall(Clone)").transform;
+		coll = wallNorth.gameObject.AddComponent<BoxCollider> ();
+		coll.size = new Vector3 (currentMap.mapSize.x * tileSize, 10, 1);
+		wallNorth.position = Vector3.forward * currentMap.mapSize.y / 2f * tileSize + Vector3.up * (coll.size.y / 2f - .1f);
+		wallNorth.parent = mapHolder;
+
+		Transform wallSouth = new GameObject ("Wall(Clone)").transform;
+		coll = wallSouth.gameObject.AddComponent<BoxCollider> ();
+		coll.size = new Vector3 (currentMap.mapSize.x * tileSize, 10, 1);
+		wallSouth.position = Vector3.back * currentMap.mapSize.y / 2f * tileSize + Vector3.up * (coll.size.y / 2f - .1f);
+		wallSouth.parent = mapHolder;
+
 		navmeshFloor.localScale = new Vector3 (maxMapSize.x, maxMapSize.y) * tileSize;
 		mapFloor.localScale = new Vector3 (currentMap.mapSize.x * tileSize, currentMap.mapSize.y * tileSize, 0.05f); 
 	}

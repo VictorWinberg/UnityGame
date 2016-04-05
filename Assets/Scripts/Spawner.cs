@@ -34,16 +34,16 @@ public class Spawner : MonoBehaviour {
 		Spawner spawner = go.AddComponent<Spawner> ();
 		spawner.enemy = enemy;
 		spawner.developerMode = true;
-		Wave[] myWaves = new Wave[5];
+		Wave[] myWaves = new Wave[10];
 		for (int i = 0; i < myWaves.Length; i++) {
 			myWaves [i] = new Wave ();
-			myWaves[i].enemyCount = 10;
+			myWaves[i].enemyCount = (int)Random.Range(3, 15);
 			myWaves[i].timeBetweenSpawns = .2f;
 
 			myWaves[i].moveSpeed = 3;
 			myWaves[i].damage = 3;
 			myWaves[i].health = 2f;
-			myWaves[i].skinColor = Color.black;
+			myWaves[i].skinColor = new Color(Random.Range(0,1f),Random.Range(0,1f),Random.Range(0,1f));
 		}
 		spawner.waves = myWaves;
 		return spawner;
@@ -134,7 +134,7 @@ public class Spawner : MonoBehaviour {
 	}
 
 	void ResetPlayerPosition() {
-		player.transform.position = map.getTileFromPosition(Vector3.zero).position + Vector3.up * 3;
+		player.transform.position = map.getTileFromPosition(Vector3.zero).position + Vector3.up * 1.5f;
 	}
 
 	void NextWave() {

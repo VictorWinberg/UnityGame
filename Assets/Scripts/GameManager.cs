@@ -13,18 +13,19 @@ public class GameManager : MonoBehaviour {
 
 	void Awake () {
 		camera = Instantiate (Resources.Load ("GameCamera"), new Vector3 (0, 12, -6), Quaternion.AngleAxis (60, Vector3.right)) as GameObject;
-		map = FindObjectOfType<MapGenerator> ();
 		crosshairs = new Crosshairs ().Create();
-		player = new Player().Create();
+		player = Player.Create();
 		player.crosshairs = crosshairs;
 		enemy = ((GameObject)Resources.Load ("Enemy")).GetComponent<Enemy> ();
 		spawner = new Spawner ().Create (enemy);
 		spawner.setPlayer = player;
+		map = MapGenerator.Create(spawner);
+		map.GenerateMap ();
 		canvas = new GameUI ().Create ();
 	}
 
 	void Start () {
-		player.aimbot = true;
+		player.aimbot = false;
 	}
 	
 	void Update () {
