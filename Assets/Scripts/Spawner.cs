@@ -29,8 +29,7 @@ public class Spawner : MonoBehaviour {
 	public event System.Action<int> OnNewWave;
 
 	public Spawner Create(Enemy enemy) {
-		GameObject go = new GameObject ();
-		go.name = "Spawner";
+		GameObject go = new GameObject ("Spawner");
 		Spawner spawner = go.AddComponent<Spawner> ();
 		spawner.enemy = enemy;
 		spawner.developerMode = true;
@@ -138,6 +137,10 @@ public class Spawner : MonoBehaviour {
 	}
 
 	void NextWave() {
+		if (currentWaveNumber > 0) {
+			AudioManager.instance.PlaySound ("Level Complete");
+		}
+
 		currentWaveNumber++;
 		if (currentWaveNumber - 1 < waves.Length) {
 			currentWave = waves [currentWaveNumber - 1];

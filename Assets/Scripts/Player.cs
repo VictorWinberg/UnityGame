@@ -87,4 +87,10 @@ public class Player : LivingEntity {
 	public Gun getGun() {
 		return gunController.getGun ();
 	}
+
+	public override void Die ()
+	{
+		AudioManager.instance.PlaySound ("Player Death", transform.position);
+		base.Die ();
+	}
 }

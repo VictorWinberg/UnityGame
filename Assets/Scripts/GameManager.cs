@@ -23,10 +23,12 @@ public class GameManager : MonoBehaviour {
 		spawner.setPlayer = player;
 		map = MapGenerator.Create(spawner);
 		map.GenerateMap ();
+		AudioManager.Create (player, transform.GetComponent<SoundLibrary>());
 	}
 
 	void Start () {
-		player.aimbot = false;
+		player.aimbot = true;
+		player.startingHealth = 10;
 		canvas = new GameUI ().Create (this);
 	}
 	
