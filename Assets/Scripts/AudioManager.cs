@@ -1,13 +1,14 @@
 ﻿using UnityEngine;
 using System.Collections;
 
+[RequireComponent (typeof (SoundLibrary))]
 public class AudioManager : MonoBehaviour {
 
 	public enum AudioChannel {Master, SFX, Music};
 
-	float masterVolume = .3f;
-	float sfxVolume = 1;
-	float musicVolume = 1;
+	public float masterVolume { get; private set; }
+	public float sfxVolume { get; private set; }
+	public float musicVolume { get; private set; }
 
 	AudioSource sfxSource2D;
 	AudioSource[] musicSources;
@@ -19,28 +20,16 @@ public class AudioManager : MonoBehaviour {
 
 	public static AudioManager instance;
 
-	public static void Create(Player player, SoundLibrary soundLibrary) {
-		GameObject go = new GameObject("AudioManager");
-		AudioManager audioManager = go.AddComponent<AudioManager> ();
-		audioManager.player = player.gameObject;
-
-		audioManager.soundLibrary = soundLibrary;
-
-		GameObject child = new GameObject ("AudioListener");
-		child.AddComponent<AudioListener> ();
-		child.transform.parent = go.transform;
-
-		audioManager.listener = child;
-	}
-
 	void Awake() {
 		if (instance != null) {
 			Destroy (gameObject);
 			return;
 		}
-
 		instance = this;
 		DontDestroyOnLoad (gameObject);
+
+		listener = transform.GetComponentInChildren<AudioListener> ().gameObject;
+		soundLibrary = transform.GetComponent<SoundLibrary> ();
 
 		musicSources = new AudioSource[2];
 		for (int i = 0; i < musicSources.Length; i++) {
@@ -54,9 +43,13 @@ public class AudioManager : MonoBehaviour {
 		sfxSource2D = newSource2D.AddComponent<AudioSource> ();
 		newSource2D.transform.parent = transform;
 
-		masterVolume = PlayerPrefs.GetFloat ("MasterVolume", masterVolume);
-		musicVolume = PlayerPrefs.GetFloat ("MusicVolume", musicVolume);
-		sfxVolume = PlayerPrefs.GetFloat ("SFXVolume", sfxVolume);
+		masterVolume = PlayerPrefs.GetFloat ("MasterVolume", 1);
+		musicVolume = PlayerPrefs.GetFloat ("MusicVolume", 1);
+		sfxVolume = PlayerPrefs.GetFloat ("SFXVolume", 1);
+	}
+
+	public void SetPlayer(GameObject player) {
+		this.player = player;
 	}
 
 	void Update() {
@@ -84,6 +77,7 @@ public class AudioManager : MonoBehaviour {
 		PlayerPrefs.SetFloat ("MasterVolume", masterVolume);
 		PlayerPrefs.SetFloat ("MusicVolume", musicVolume);
 		PlayerPrefs.SetFloat ("SFXVolume", sfxVolume);
+		PlayerPrefs.Save ();
 	}
 
 	public void PlayMusic(AudioClip clip, float fadeDuration = 1) {

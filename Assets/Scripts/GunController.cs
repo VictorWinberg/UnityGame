@@ -54,4 +54,8 @@ public class GunController : MonoBehaviour {
 	public Gun getGun() {
 		return guns[gunIndex % guns.Length];
 	}
+
+	public Gun getGunWithIndex(int gunIndex) {
+		return guns[gunIndex % guns.Length];
+	}
 }

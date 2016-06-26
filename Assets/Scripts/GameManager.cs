@@ -15,21 +15,26 @@ public class GameManager : MonoBehaviour {
 
 	void Awake () {
 		camera = Instantiate (Resources.Load ("GameCamera"), new Vector3 (0, 12, -6), Quaternion.AngleAxis (60, Vector3.right)) as GameObject;
-		crosshairs = new Crosshairs ().Create();
+		GameObject cache = new GameObject("Cache");
+		crosshairs = cache.AddComponent<Crosshairs> ().Create ();
 		player = Player.Create();
 		player.crosshairs = crosshairs;
 		enemy = ((GameObject)Resources.Load ("Enemy")).GetComponent<Enemy> ();
-		spawner = new Spawner ().Create (enemy);
+		spawner = cache.AddComponent<Spawner>().Create (enemy);
 		spawner.setPlayer = player;
 		map = MapGenerator.Create(spawner);
 		map.GenerateMap ();
-		AudioManager.Create (player, transform.GetComponent<SoundLibrary>());
+		GameObject audioManager = Instantiate (Resources.Load ("AudioManager"), Vector3.zero, Quaternion.identity) as GameObject;
+		audioManager.GetComponent<AudioManager> ().SetPlayer (player.gameObject);
+		Destroy (cache);
 	}
 
 	void Start () {
 		player.aimbot = true;
 		player.startingHealth = 10;
-		canvas = new GameUI ().Create (this);
+		GameObject cache = new GameObject ("Cache");
+		canvas = cache.AddComponent<GameUI>().Create (spawner, this);
+		Destroy (cache);
 	}
 	
 	void Update () {

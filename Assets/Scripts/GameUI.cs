@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 using System.Collections;
 
 public class GameUI : MonoBehaviour {
@@ -14,18 +15,15 @@ public class GameUI : MonoBehaviour {
 
 	Spawner spawner;
 
-	void Awake() {
-		spawner = FindObjectOfType<Spawner> ();
-		spawner.OnNewWave += OnNewWave;
-	}
-
 	void Start () {
 		FindObjectOfType<Player> ().OnDeath += OnGameOver;
 	}
 
-	public GameUI Create(GameManager manager) {
+	public GameUI Create(Spawner spawner, GameManager manager) {
 		GameUI gui = ((GameObject)Instantiate(Resources.Load("Canvas"), Vector3.zero, Quaternion.identity)).GetComponent<GameUI>();
 		gui.manager = manager;
+		gui.spawner = spawner;
+		spawner.OnNewWave += gui.OnNewWave;
 		return gui;
 	}
 
@@ -79,6 +77,6 @@ public class GameUI : MonoBehaviour {
 
 	// UI Input
 	public void StartNewGame() {
-		Application.LoadLevel ("Scene2");
+		SceneManager.LoadScene ("Game");
 	}
 }
