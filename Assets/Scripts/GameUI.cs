@@ -39,7 +39,7 @@ public class GameUI : MonoBehaviour {
 	void OnNewWave(int waveNumber) {
 		waveTitle.text = "- Wave " + HumanFriendlyInteger.IntegerToWritten (waveNumber) + " -";
 		string enemyCount = (spawner.waves [waveNumber - 1].infinite) ? "Infinite" : spawner.waves [waveNumber - 1].enemyCount + "";
-		enemyCount += " | Health: " + (int)(manager.getPlayer ().getHealth ()) + " | Mode: " + manager.getPlayer ().getGun ().fireMode;
+		//enemyCount += " | Health: " + (int)(manager.getPlayer ().getHealth ()) + " | Mode: " + manager.getPlayer ().getGun ().fireMode;
 		waveEnemyCount.text = "Enemies: " + enemyCount;
 		StopCoroutine ("AnimateWaveBanner");
 		StartCoroutine ("AnimateWaveBanner");

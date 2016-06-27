@@ -39,7 +39,7 @@ public class Spawner : MonoBehaviour {
 			myWaves[i].enemyCount = (int)Random.Range(3 * (i + 1), 5 * (i+ 1));
 			myWaves[i].timeBetweenSpawns = Random.Range(.2f, 1f);
 
-			myWaves[i].moveSpeed = 2f;
+			myWaves[i].moveSpeed = 2f + 0.2f * i;
 			myWaves[i].damage = (int)(20 * Mathf.Log(i + 3) / (i + 1));
 			myWaves[i].health = (int)(i / 5 + 1);
 			myWaves[i].skinColor = new Color(Random.Range(0,1f),Random.Range(0,1f),Random.Range(0,1f));

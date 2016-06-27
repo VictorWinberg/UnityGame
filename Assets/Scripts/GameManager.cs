@@ -32,8 +32,8 @@ public class GameManager : MonoBehaviour {
 	}
 
 	void Start () {
-		player.aimbot = true;
-		player.startingHealth = 100;
+		//player.aimbot = false;
+		//player.startingHealth = 100;
 		GameObject cache = new GameObject ("Cache");
 		canvas = cache.AddComponent<GameUI>().Create (player, spawner, this);
 		Destroy (cache);

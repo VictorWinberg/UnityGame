@@ -29,6 +29,7 @@ public class Player : LivingEntity {
 	}
 
 	void OnNewWave(int waveNumber) {
+		startingHealth += 20;
 		health = startingHealth;
 		gunController.EquipGun (waveNumber - 1);
 	}

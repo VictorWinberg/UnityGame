@@ -72,7 +72,7 @@ public class AudioManager : MonoBehaviour {
 		}
 
 		musicSources [0].volume = musicVolume * masterVolume;
-		musicSources [1].volume = musicVolume * masterVolume;
+		//musicSources [1].volume = musicVolume * masterVolume;
 
 		PlayerPrefs.SetFloat ("MasterVolume", masterVolume);
 		PlayerPrefs.SetFloat ("MusicVolume", musicVolume);

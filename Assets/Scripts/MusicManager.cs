@@ -9,11 +9,12 @@ public class MusicManager : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-		OnLevelWasLoaded (0);
+		SceneManager.sceneLoaded += SceneLoaded;
+		SceneLoaded (SceneManager.GetActiveScene (), LoadSceneMode.Additive);
 	}
 	
-	void OnLevelWasLoaded(int sceneIndex) {
-		string newSceneName = SceneManager.GetActiveScene ().name;
+	void SceneLoaded(Scene scene, LoadSceneMode m) {
+		string newSceneName = scene.name;
 		if (newSceneName != sceneName) {
 			sceneName = newSceneName;
 			Invoke ("PlayMusic", .2f);
