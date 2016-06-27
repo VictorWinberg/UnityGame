@@ -65,7 +65,8 @@ public class MapGenerator : MonoBehaviour {
 			myMaps[i].backgroundColor = new Color(Random.Range(0,1f),Random.Range(0,1f),Random.Range(0,1f));
 		}
 		generator.maps = myMaps;
-		spawner.OnNewWave += generator.OnNewWave;
+		if(spawner != null)
+			spawner.OnNewWave += generator.OnNewWave;
 		return generator;
 	}
 

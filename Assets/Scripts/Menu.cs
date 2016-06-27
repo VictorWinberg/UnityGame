@@ -16,6 +16,26 @@ public class Menu : MonoBehaviour {
 
 	void Awake() {
 		GameObject go = Instantiate (Resources.Load ("AudioManager"), Vector3.zero, Quaternion.identity) as GameObject;
+
+		map = MapGenerator.Create (null);
+		map.GenerateMap ();
+	}
+
+	MapGenerator map;
+	float starttime = 3f;
+	float timer = 0;
+
+	void Update() {
+		map.transform.RotateAround (Vector3.zero, Vector3.up, .3f);
+
+		timer += Time.deltaTime;
+		if (timer > starttime) {
+			timer = 0;
+			map.mapIndex++;
+			map.transform.rotation = Quaternion.identity;
+			map.GenerateMap ();
+		}
+
 	}
 
 	void Start() {

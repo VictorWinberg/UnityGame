@@ -8,22 +8,31 @@ public class GameUI : MonoBehaviour {
 	public Image fadeCanvas;
 	public GameObject gameOverUI;
 
-	public RectTransform waveBanner;
-	public Text waveTitle, waveEnemyCount;
+	public RectTransform waveBanner, healthbar;
+	public Text waveTitle, waveEnemyCount, scoreUI, gameOverScore, healthbarHp;
 
 	private GameManager manager;
 
 	Spawner spawner;
+	Player player;
 
-	void Start () {
-		FindObjectOfType<Player> ().OnDeath += OnGameOver;
+	void Update() {
+		scoreUI.text = Scoreboard.score.ToString("D6");
+		float healthPercent = 0;
+		if (player != null) {
+			healthPercent = player.health / player.startingHealth;
+			healthbarHp.text = player.health + "/" + player.startingHealth;
+		}
+		healthbar.localScale = new Vector3 (healthPercent, 1, 1);
 	}
 
-	public GameUI Create(Spawner spawner, GameManager manager) {
+	public GameUI Create(Player player, Spawner spawner, GameManager manager) {
 		GameUI gui = ((GameObject)Instantiate(Resources.Load("Canvas"), Vector3.zero, Quaternion.identity)).GetComponent<GameUI>();
 		gui.manager = manager;
 		gui.spawner = spawner;
 		spawner.OnNewWave += gui.OnNewWave;
+		gui.player = player;
+		player.OnDeath += gui.OnGameOver;
 		return gui;
 	}
 
@@ -60,7 +69,11 @@ public class GameUI : MonoBehaviour {
 	}
 	
 	void OnGameOver () {
-		StartCoroutine(Fade(Color.clear, Color.black, 1));
+		Cursor.visible = true;
+		StartCoroutine(Fade(Color.clear, new Color(1, 1, 1, .8f), 1));
+		gameOverScore.text = scoreUI.text;
+		scoreUI.gameObject.SetActive (false);
+		healthbar.transform.parent.gameObject.SetActive (false);
 		gameOverUI.SetActive (true);
 	}
 
@@ -78,5 +91,9 @@ public class GameUI : MonoBehaviour {
 	// UI Input
 	public void StartNewGame() {
 		SceneManager.LoadScene ("Game");
+	}
+
+	public void ReturnToMainMenu() {
+		SceneManager.LoadScene ("Menu");
 	}
 }

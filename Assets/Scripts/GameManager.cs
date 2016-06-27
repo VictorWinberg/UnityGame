@@ -7,6 +7,7 @@ public class GameManager : MonoBehaviour {
 
 	private GameObject camera;
 	private MapGenerator map;
+	private Scoreboard scoreboard;
 	private Crosshairs crosshairs;
 	private Player player;
 	private Enemy enemy;
@@ -24,6 +25,7 @@ public class GameManager : MonoBehaviour {
 		spawner.setPlayer = player;
 		map = MapGenerator.Create(spawner);
 		map.GenerateMap ();
+		scoreboard = cache.AddComponent<Scoreboard> ().Create (player);
 		GameObject audioManager = Instantiate (Resources.Load ("AudioManager"), Vector3.zero, Quaternion.identity) as GameObject;
 		audioManager.GetComponent<AudioManager> ().SetPlayer (player.gameObject);
 		Destroy (cache);
@@ -31,9 +33,9 @@ public class GameManager : MonoBehaviour {
 
 	void Start () {
 		player.aimbot = true;
-		player.startingHealth = 10;
+		player.startingHealth = 100;
 		GameObject cache = new GameObject ("Cache");
-		canvas = cache.AddComponent<GameUI>().Create (spawner, this);
+		canvas = cache.AddComponent<GameUI>().Create (player, spawner, this);
 		Destroy (cache);
 	}
 	
