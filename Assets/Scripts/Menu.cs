@@ -17,7 +17,7 @@ public class Menu : MonoBehaviour {
 	void Awake() {
 		GameObject go = Instantiate (Resources.Load ("AudioManager"), Vector3.zero, Quaternion.identity) as GameObject;
 
-		map = MapGenerator.Create (null);
+		map = MapGenerator.Create ();
 		map.GenerateMap ();
 	}
 

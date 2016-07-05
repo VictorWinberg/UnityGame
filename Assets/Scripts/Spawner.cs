@@ -5,8 +5,8 @@ public class Spawner : MonoBehaviour {
 
 	public bool developerMode;
 
-	public Wave[] waves;
-	public Enemy enemy;
+	public Wave[] waves  { get; private set; }
+	private Enemy enemy;
 
 	LivingEntity player;
 
@@ -28,10 +28,10 @@ public class Spawner : MonoBehaviour {
 
 	public event System.Action<int> OnNewWave;
 
-	public Spawner Create(Enemy enemy) {
+	public static Spawner Create() {
 		GameObject go = new GameObject ("Spawner");
 		Spawner spawner = go.AddComponent<Spawner> ();
-		spawner.enemy = enemy;
+		spawner.enemy = ((GameObject)Resources.Load ("Enemy")).GetComponent<Enemy>();
 		spawner.developerMode = true;
 		Wave[] myWaves = new Wave[GameManager.waves];
 		for (int i = 0; i < myWaves.Length; i++) {

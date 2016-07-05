@@ -15,6 +15,14 @@ public class GameUI : MonoBehaviour {
 
 	Spawner spawner;
 	Player player;
+	
+	void Start () {
+		manager = FindObjectOfType<GameManager>();
+		spawner = FindObjectOfType<Spawner>();
+		spawner.OnNewWave += OnNewWave;
+		player = FindObjectOfType<Player>();
+		player.OnDeath += OnGameOver;
+	}
 
 	void Update() {
 		scoreUI.text = Scoreboard.score.ToString("D6");
@@ -24,16 +32,6 @@ public class GameUI : MonoBehaviour {
 			healthbarHp.text = player.health + "/" + player.startingHealth;
 		}
 		healthbar.localScale = new Vector3 (healthPercent, 1, 1);
-	}
-
-	public GameUI Create(Player player, Spawner spawner, GameManager manager) {
-		GameUI gui = ((GameObject)Instantiate(Resources.Load("Canvas"), Vector3.zero, Quaternion.identity)).GetComponent<GameUI>();
-		gui.manager = manager;
-		gui.spawner = spawner;
-		spawner.OnNewWave += gui.OnNewWave;
-		gui.player = player;
-		player.OnDeath += gui.OnGameOver;
-		return gui;
 	}
 
 	void OnNewWave(int waveNumber) {

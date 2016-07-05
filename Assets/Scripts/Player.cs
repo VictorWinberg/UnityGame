@@ -15,30 +15,12 @@ public class Player : LivingEntity {
 
 	public bool aimbot = false;
 
-	public static Player Create() {
-		Player player = ((GameObject)Instantiate (Resources.Load ("Player"), Vector3.up, Quaternion.identity)).GetComponent<Player> ();
-		player.controller = player.gameObject.GetComponent<PlayerController> ();
-		player.gunController = player.gameObject.GetComponent<GunController> ();
-		player.viewCamera = Camera.main;
-		return player;
-	}
-
-	protected override void Start () {
-		base.Start ();
+	void Start () {
+		controller = GetComponent<PlayerController> ();
+		gunController = GetComponent<GunController> ();
+		crosshairs = FindObjectOfType<Crosshairs> ();
+		viewCamera = Camera.main;
 		FindObjectOfType<Spawner> ().OnNewWave += OnNewWave;
-	}
-
-	void OnNewWave(int waveNumber) {
-		startingHealth += 20;
-		health = startingHealth;
-		gunController.EquipGun (waveNumber - 1);
-	}
-
-	void LookAtTarget (Vector3 point) {
-		controller.LookAt (point);
-		crosshairs.transform.position = point;
-		if((new Vector2(point.x, point.z) - new Vector2(transform.position.x, transform.position.z)).sqrMagnitude > 1)
-			gunController.Aim (point);
 	}
 
 	void Update () {
@@ -83,6 +65,19 @@ public class Player : LivingEntity {
 		if (Input.GetKeyDown (KeyCode.R)) {
 			gunController.Reload();
 		}
+	}
+
+	void OnNewWave(int waveNumber) {
+		if (waveNumber != 1) startingHealth = (int)(startingHealth * 1.2f);
+		health = startingHealth;
+		gunController.EquipGun (waveNumber - 1);
+	}
+
+	void LookAtTarget (Vector3 point) {
+		controller.LookAt (point);
+		crosshairs.transform.position = point;
+		if((new Vector2(point.x, point.z) - new Vector2(transform.position.x, transform.position.z)).sqrMagnitude > 1)
+			gunController.Aim (point);
 	}
 
 	public Gun getGun() {

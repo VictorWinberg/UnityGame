@@ -9,13 +9,9 @@ public class Scoreboard : MonoBehaviour {
 	float killStreakExpiry = 1f;
 
 	// Use this for initialization
-	public Scoreboard Create (Player player) {
-		GameObject go = new GameObject ("Scoreboard");
-		Scoreboard scoreboard = go.AddComponent<Scoreboard> ();
-
-		Enemy.OnDeathStatic += scoreboard.OnEnemyKilled;
-		player.OnDeath += OnPlayerDeath;
-		return scoreboard;
+	void Start() {
+		Enemy.OnDeathStatic += OnEnemyKilled;
+		FindObjectOfType<Player> ().OnDeath += OnPlayerDeath;
 	}
 
 	void OnEnemyKilled() {

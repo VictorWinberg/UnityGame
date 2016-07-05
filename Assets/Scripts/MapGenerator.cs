@@ -20,7 +20,7 @@ public class MapGenerator : MonoBehaviour {
 
 	Map currentMap;
 
-	public static MapGenerator Create(Spawner spawner) {
+	public static MapGenerator Create() {
 		MapGenerator generator = new GameObject ("Map").AddComponent<MapGenerator> ();
 		generator.tilePrefab = ((GameObject)Resources.Load ("Tile")).transform;
 		generator.obstaclePrefab = ((GameObject)Resources.Load ("Obstacle")).transform;
@@ -65,8 +65,7 @@ public class MapGenerator : MonoBehaviour {
 			myMaps[i].backgroundColor = new Color(Random.Range(0,1f),Random.Range(0,1f),Random.Range(0,1f));
 		}
 		generator.maps = myMaps;
-		if(spawner != null)
-			spawner.OnNewWave += generator.OnNewWave;
+		FindObjectOfType<Spawner> ().OnNewWave += generator.OnNewWave;
 		return generator;
 	}
 
