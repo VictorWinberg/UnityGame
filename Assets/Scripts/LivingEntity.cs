@@ -1,7 +1,8 @@
 ﻿using UnityEngine;
+using UnityEngine.Networking;
 using System.Collections;
 
-public class LivingEntity : MonoBehaviour, IDamageable {
+public class LivingEntity : NetworkBehaviour, IDamageable {
 
 	public float startingHealth = 2;
 	public float health { get; protected set; }
@@ -24,10 +25,6 @@ public class LivingEntity : MonoBehaviour, IDamageable {
 		if (health <= 0 && !dead) {
 			Die();
 		}
-	}
-
-	public float getHealth() {
-		return health;
 	}
 
 	[ContextMenu("Self Destruct")]

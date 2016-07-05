@@ -16,14 +16,28 @@ public class Player : LivingEntity {
 	public bool aimbot = false;
 
 	void Start () {
+		if (!isLocalPlayer)
+			return;
+		
 		controller = GetComponent<PlayerController> ();
 		gunController = GetComponent<GunController> ();
 		crosshairs = FindObjectOfType<Crosshairs> ();
 		viewCamera = Camera.main;
-		FindObjectOfType<Spawner> ().OnNewWave += OnNewWave;
+		Spawner spawner = FindObjectOfType<Spawner> ();
+		spawner.OnNewWave += OnNewWave;
+		spawner.setPlayer = this;
+		FindObjectOfType<GameUI> ().setPlayer = this;
+		FindObjectOfType<Scoreboard> ().setPlayer = this;
+	}
+
+	public override void OnStartLocalPlayer () {
+		GetComponent<MeshRenderer>().material.color = Color.blue;
 	}
 
 	void Update () {
+		if (!isLocalPlayer)
+			return;
+		
 		// Movement input
 		Vector3 moveInput = new Vector3 (Input.GetAxisRaw ("Horizontal"), 0, Input.GetAxisRaw ("Vertical"));
 		Vector3 moveVelocity = moveInput.normalized * moveSpeed;

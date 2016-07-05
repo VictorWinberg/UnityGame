@@ -25,19 +25,6 @@ public class Menu : MonoBehaviour {
 	float starttime = 3f;
 	float timer = 0;
 
-	void Update() {
-		map.transform.RotateAround (Vector3.zero, Vector3.up, .3f);
-
-		timer += Time.deltaTime;
-		if (timer > starttime) {
-			timer = 0;
-			map.mapIndex++;
-			map.transform.rotation = Quaternion.identity;
-			map.GenerateMap ();
-		}
-
-	}
-
 	void Start() {
 		resolutionIndex = PlayerPrefs.GetInt ("Resolution index");
 		bool isFullscreen = (PlayerPrefs.GetInt ("Fullscreen") == 1) ? true : false;
@@ -51,6 +38,19 @@ public class Menu : MonoBehaviour {
 		}
 
 		fullscreenToggle.isOn = isFullscreen;
+	}
+	
+	void Update() {
+		map.transform.RotateAround (Vector3.zero, Vector3.up, .3f);
+		
+		timer += Time.deltaTime;
+		if (timer > starttime) {
+			timer = 0;
+			map.mapIndex++;
+			map.transform.rotation = Quaternion.identity;
+			map.GenerateMap ();
+		}
+		
 	}
 
 	public void Play() {

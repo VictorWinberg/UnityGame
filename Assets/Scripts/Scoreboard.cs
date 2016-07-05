@@ -8,10 +8,15 @@ public class Scoreboard : MonoBehaviour {
 	int killStreak;
 	float killStreakExpiry = 1f;
 
+	public Player setPlayer {
+		set {
+			value.OnDeath += OnPlayerDeath;
+		}
+	}
+
 	// Use this for initialization
 	void Start() {
 		Enemy.OnDeathStatic += OnEnemyKilled;
-		FindObjectOfType<Player> ().OnDeath += OnPlayerDeath;
 	}
 
 	void OnEnemyKilled() {

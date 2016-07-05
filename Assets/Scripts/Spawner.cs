@@ -49,21 +49,20 @@ public class Spawner : MonoBehaviour {
 	}
 
 	void Start () {
-		if(player == null)
-			player = FindObjectOfType<Player> ();
-
-		nextIdleTimeCheck = idleTimeCheck + Time.time;
-		idlePositionPrevious = player.transform.position;
-		player.OnDeath += OnPlayerDeath;
-
+		isDisabled = true;
 		map = FindObjectOfType<MapGenerator> ();
-		NextWave ();
 	}
 
 	public Player setPlayer {
 		set 
 		{
-			player = value; 
+			Cursor.visible = false;
+			player = value;
+			nextIdleTimeCheck = idleTimeCheck + Time.time;
+			idlePositionPrevious = player.transform.position;
+			player.OnDeath += OnPlayerDeath;
+			isDisabled = false;
+			NextWave ();
 		}
 	}
 

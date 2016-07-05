@@ -8,6 +8,13 @@ public class GameUI : MonoBehaviour {
 	public Image fadeCanvas;
 	public GameObject gameOverUI;
 
+	public Player setPlayer {
+		set {
+			player = value;
+			player.OnDeath += OnGameOver; 
+		}
+	}
+
 	public RectTransform waveBanner, healthbar;
 	public Text waveTitle, waveEnemyCount, scoreUI, gameOverScore, healthbarHp;
 
@@ -20,8 +27,6 @@ public class GameUI : MonoBehaviour {
 		manager = FindObjectOfType<GameManager>();
 		spawner = FindObjectOfType<Spawner>();
 		spawner.OnNewWave += OnNewWave;
-		player = FindObjectOfType<Player>();
-		player.OnDeath += OnGameOver;
 	}
 
 	void Update() {
