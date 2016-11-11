@@ -5,7 +5,7 @@ using System.Collections;
 public class GameManager : MonoBehaviour {
 
 	public static int waves = 30;
-	public bool debug = false;
+	public bool devMode;
 
 	private GameObject camera;
 	private MapGenerator map;
@@ -17,22 +17,13 @@ public class GameManager : MonoBehaviour {
 	private GameUI canvas;
 
 	void Awake () {
-		//player = ((GameObject)Instantiate(Resources.Load ("Player"), Vector3.zero, Quaternion.identity)).GetComponent<Player>();
-		//player.crosshairs = FindObjectOfType<Crosshairs>();
+		devMode = true;
+
 		enemy = ((GameObject)Resources.Load ("Enemy")).GetComponent<Enemy> ();
 		spawner = Spawner.Create ();
-		spawner.developerMode = debug;
+		spawner.devMode = devMode;
 		map = MapGenerator.Create();
 		map.GenerateMap ();
 		GameObject audioManager = Instantiate (Resources.Load ("AudioManager"), Vector3.zero, Quaternion.identity) as GameObject;
-	}
-
-	void Start () {
-		//player.aimbot = true;
-		//player.startingHealth = 100000;
-	}
-	
-	void Update () {
-
 	}
 }

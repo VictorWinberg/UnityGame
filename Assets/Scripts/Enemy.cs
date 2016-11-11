@@ -16,17 +16,18 @@ public class Enemy : LivingEntity {
 	Material skinMaterial;
 
 	Color originalColour;
-	
+
 	float attackDistanceThreshold = .5f;
 	float timeBetweenAttacks = 1;
 	float damage = 1;
 	
-	float nextAttackTime, myCollisionRadius, targetCollisionRadius;
+	float nextAttackTime, myCollisionRadius, targetCollisionRadius, moveSpeed, angularSpeed;
 
 	bool hasTarget;
 
 	void Awake() {
 		pathfinder = GetComponent<NavMeshAgent> ();
+		angularSpeed = pathfinder.angularSpeed;
 		
 		if (GameObject.FindGameObjectWithTag ("Player") != null) {
 			hasTarget = true;
@@ -52,6 +53,7 @@ public class Enemy : LivingEntity {
 	}
 
 	public void SetCharacteristics (float moveSpeed, int damage, float health, Color skinColor){
+		this.moveSpeed = moveSpeed;
 		pathfinder.speed = moveSpeed;
 
 		if (hasTarget) this.damage = damage;
@@ -142,6 +144,16 @@ public class Enemy : LivingEntity {
 				}
 			}
 			yield return new WaitForSeconds(refreshRate);
+		}
+	}
+
+	public void Freeze(bool freeze) {
+		if (freeze) {
+			pathfinder.speed = 0;
+			pathfinder.angularSpeed = 0;
+		} else {
+			pathfinder.speed = moveSpeed;
+			pathfinder.angularSpeed = angularSpeed;
 		}
 	}
 }

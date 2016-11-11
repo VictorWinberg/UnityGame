@@ -3,7 +3,7 @@ using System.Collections;
 
 public class Spawner : MonoBehaviour {
 
-	public bool developerMode;
+	public bool devMode;
 
 	public Wave[] waves  { get; private set; }
 	private Enemy enemy;
@@ -22,9 +22,7 @@ public class Spawner : MonoBehaviour {
 	float idleThresholdDistance = 1.5f;
 	float nextIdleTimeCheck;
 	Vector3 idlePositionPrevious;
-	bool isIdle;
-
-	bool isDisabled;
+	bool isIdle, isDisabled, isFrozen;
 
 	public event System.Action<int> OnNewWave;
 
@@ -34,11 +32,11 @@ public class Spawner : MonoBehaviour {
 		spawner.enemy = ((GameObject)Resources.Load ("Enemy")).GetComponent<Enemy>();
 		Wave[] myWaves = new Wave[GameManager.waves];
 		for (int i = 0; i < myWaves.Length; i++) {
-			myWaves [i] = new Wave ();
+			myWaves[i] = new Wave ();
 			myWaves[i].enemyCount = (int)Random.Range(3 * (i + 1), 5 * (i+ 1));
 			myWaves[i].timeBetweenSpawns = Random.Range(.2f, 1f);
 
-			//myWaves[i].moveSpeed = 2f + 0.2f * i;
+			myWaves[i].moveSpeed = 2f + 0.2f * i;
 			myWaves[i].damage = (int)(20 * Mathf.Log(i + 3) / (i + 1));
 			myWaves[i].health = (int)(i / 5 + 1);
 			myWaves[i].skinColor = new Color(Random.Range(0,1f),Random.Range(0,1f),Random.Range(0,1f));
@@ -83,13 +81,19 @@ public class Spawner : MonoBehaviour {
 			StartCoroutine("SpawnEnemy");
 		}
 
-		if (developerMode) {
-			if(Input.GetKeyDown(KeyCode.Return)) {
-				StopCoroutine("SpawnEnemy");
-				foreach(Enemy enemy in FindObjectsOfType<Enemy>()) {
-					GameObject.Destroy(enemy.gameObject);
+		if (devMode) {
+			if (Input.GetKeyDown (KeyCode.Return)) {
+				StopCoroutine ("SpawnEnemy");
+				foreach (Enemy enemy in FindObjectsOfType<Enemy>()) {
+					GameObject.Destroy (enemy.gameObject);
 				}
-				NextWave();
+				NextWave ();
+			}
+			if (Input.GetKeyDown (KeyCode.F)) {
+				isFrozen = !isFrozen;
+				foreach (Enemy enemy in FindObjectsOfType<Enemy>()) {
+					enemy.Freeze (isFrozen);
+				}
 			}
 		}
 	}
@@ -115,7 +119,7 @@ public class Spawner : MonoBehaviour {
 		Enemy spawnedEnemy = Instantiate(enemy, spawnTile.position + Vector3.up, Quaternion.identity) as Enemy;
 		spawnedEnemy.OnDeath += OnEnemyDeath;
 
-		spawnedEnemy.SetCharacteristics (currentWave.moveSpeed, currentWave.damage, currentWave.health, currentWave.skinColor);
+		spawnedEnemy.SetCharacteristics (isFrozen ? 0 : currentWave.moveSpeed, currentWave.damage, currentWave.health, currentWave.skinColor);
 	}
 
 	void OnPlayerDeath() {

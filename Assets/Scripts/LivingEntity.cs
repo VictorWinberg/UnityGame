@@ -4,15 +4,16 @@ using System.Collections;
 
 public abstract class LivingEntity : NetworkBehaviour, IDamageable {
 
-	public float startingHealth = 2;
+	public float startingHealth { get; protected set; }
 	[SyncVar(hook = "ChangeHealth")]
 	protected float health;
-	protected bool dead;
+	protected bool dead, devMode;
 
 	public event System.Action OnDeath, OnChangeHealth;
 
 	protected virtual void Start() {
 		health = startingHealth;
+		devMode = FindObjectOfType<GameManager> ().devMode;
 	}
 
 	public virtual void TakeHit (float damage, Vector3 hitPoint, Vector3 hitDirection) {

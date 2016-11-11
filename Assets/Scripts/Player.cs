@@ -13,12 +13,16 @@ public class Player : LivingEntity {
 	PlayerController controller;
 	GunController gunController;
 
-	public bool aimbot = false;
+	private bool aimbot = false;
 
 	void Start () {
 		if (!isLocalPlayer)
 			return;
-		
+
+		startingHealth = 80;
+
+		base.Start ();
+
 		controller = GetComponent<PlayerController> ();
 		gunController = GetComponent<GunController> ();
 		crosshairs = FindObjectOfType<Crosshairs> ();
@@ -78,6 +82,10 @@ public class Player : LivingEntity {
 		}
 		if (Input.GetKeyDown (KeyCode.R)) {
 			gunController.Reload();
+		}
+		if (devMode) {
+			if(Input.GetKeyDown (KeyCode.G)) aimbot = !aimbot;
+			if (Input.GetKeyDown (KeyCode.H)) Heal (startingHealth);
 		}
 	}
 

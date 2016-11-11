@@ -13,6 +13,7 @@ public class GameUI : MonoBehaviour {
 			player = value;
 			player.OnDeath += OnGameOver; 
 			player.OnChangeHealth += OnChangeHealth;
+			OnChangeHealth ();
 		}
 	}
 
