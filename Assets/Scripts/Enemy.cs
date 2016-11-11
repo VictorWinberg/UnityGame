@@ -63,8 +63,7 @@ public class Enemy : LivingEntity {
 		originalColour = skinMaterial.color;
 	}
 
-	public override void TakeHit (float damage, Vector3 hitPoint, Vector3 hitDirection)
-	{
+	public override void TakeHit (float damage, Vector3 hitPoint, Vector3 hitDirection) {
 		AudioManager.instance.PlaySound ("Impact", transform.position);
 		if (damage <= health) {
 			if (OnDeathStatic != null) {

@@ -32,14 +32,13 @@ public class Spawner : MonoBehaviour {
 		GameObject go = new GameObject ("Spawner");
 		Spawner spawner = go.AddComponent<Spawner> ();
 		spawner.enemy = ((GameObject)Resources.Load ("Enemy")).GetComponent<Enemy>();
-		spawner.developerMode = true;
 		Wave[] myWaves = new Wave[GameManager.waves];
 		for (int i = 0; i < myWaves.Length; i++) {
 			myWaves [i] = new Wave ();
 			myWaves[i].enemyCount = (int)Random.Range(3 * (i + 1), 5 * (i+ 1));
 			myWaves[i].timeBetweenSpawns = Random.Range(.2f, 1f);
 
-			myWaves[i].moveSpeed = 2f + 0.2f * i;
+			//myWaves[i].moveSpeed = 2f + 0.2f * i;
 			myWaves[i].damage = (int)(20 * Mathf.Log(i + 3) / (i + 1));
 			myWaves[i].health = (int)(i / 5 + 1);
 			myWaves[i].skinColor = new Color(Random.Range(0,1f),Random.Range(0,1f),Random.Range(0,1f));

@@ -1,7 +1,8 @@
 ﻿using UnityEngine;
+using UnityEngine.Networking;
 using System.Collections;
 
-public class Shell : MonoBehaviour {
+public class Shell : NetworkBehaviour {
 
 	public Rigidbody body;
 	public float forceMin, forceMax;

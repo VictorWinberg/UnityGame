@@ -12,6 +12,7 @@ public class GameUI : MonoBehaviour {
 		set {
 			player = value;
 			player.OnDeath += OnGameOver; 
+			player.OnChangeHealth += OnChangeHealth;
 		}
 	}
 
@@ -29,12 +30,12 @@ public class GameUI : MonoBehaviour {
 		spawner.OnNewWave += OnNewWave;
 	}
 
-	void Update() {
+	void OnChangeHealth() {
 		scoreUI.text = Scoreboard.score.ToString("D6");
 		float healthPercent = 0;
 		if (player != null) {
-			healthPercent = player.health / player.startingHealth;
-			healthbarHp.text = player.health + "/" + player.startingHealth;
+			healthPercent = player._health() / player.startingHealth;
+			healthbarHp.text = player._health() + "/" + player.startingHealth;
 		}
 		healthbar.localScale = new Vector3 (healthPercent, 1, 1);
 	}

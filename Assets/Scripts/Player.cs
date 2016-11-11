@@ -37,7 +37,7 @@ public class Player : LivingEntity {
 	void Update () {
 		if (!isLocalPlayer)
 			return;
-		
+
 		// Movement input
 		Vector3 moveInput = new Vector3 (Input.GetAxisRaw ("Horizontal"), 0, Input.GetAxisRaw ("Vertical"));
 		Vector3 moveVelocity = moveInput.normalized * moveSpeed;
@@ -102,8 +102,7 @@ public class Player : LivingEntity {
 		return gunController.getGunWithIndex (gunIndex);
 	}
 
-	public override void Die ()
-	{
+	public override void Die () {
 		AudioManager.instance.PlaySound ("Player Death", transform.position);
 		base.Die ();
 	}

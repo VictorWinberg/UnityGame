@@ -1,9 +1,11 @@
 ﻿using UnityEngine;
+using UnityEngine.Networking;
 using System.Collections;
 
 public class GameManager : MonoBehaviour {
 
 	public static int waves = 30;
+	public bool debug = false;
 
 	private GameObject camera;
 	private MapGenerator map;
@@ -19,6 +21,7 @@ public class GameManager : MonoBehaviour {
 		//player.crosshairs = FindObjectOfType<Crosshairs>();
 		enemy = ((GameObject)Resources.Load ("Enemy")).GetComponent<Enemy> ();
 		spawner = Spawner.Create ();
+		spawner.developerMode = debug;
 		map = MapGenerator.Create();
 		map.GenerateMap ();
 		GameObject audioManager = Instantiate (Resources.Load ("AudioManager"), Vector3.zero, Quaternion.identity) as GameObject;

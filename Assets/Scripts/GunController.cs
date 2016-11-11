@@ -1,7 +1,8 @@
 ﻿using UnityEngine;
+using UnityEngine.Networking;
 using System.Collections;
 
-public class GunController : MonoBehaviour {
+public class GunController : NetworkBehaviour {
 
 	public Transform weaponHold;
 	public Gun[] guns;
@@ -14,6 +15,7 @@ public class GunController : MonoBehaviour {
 		}
 		gun = (Gun)Instantiate (gunToEquip, weaponHold.position, weaponHold.rotation);
 		gun.transform.parent = weaponHold;
+		NetworkServer.Spawn (gun.gameObject);
 	}
 
 	public void EquipGun(int gunIndex) {

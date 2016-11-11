@@ -1,7 +1,8 @@
 ﻿using UnityEngine;
+using UnityEngine.Networking;
 using System.Collections;
 
-public class Gun : MonoBehaviour {
+public class Gun : NetworkBehaviour {
 
 	public enum FireMode {Auto, Burst, Single};
 	public FireMode fireMode;
@@ -72,9 +73,11 @@ public class Gun : MonoBehaviour {
 				nextShotTime = Time.time + msBetweenShots / 1000;
 				Projectile newProjectile = Instantiate (projectile, projectileSpawns[i].position, projectileSpawns[i].rotation) as Projectile;
 				newProjectile.SetSpeed (muzzleVelocity);
+				NetworkServer.Spawn (newProjectile.gameObject);
 			}
 
-			Instantiate(shell, shellEjection.position, shellEjection.rotation);
+			Transform shellClone = Instantiate(shell, shellEjection.position, shellEjection.rotation) as Transform;
+			NetworkServer.Spawn (shellClone.gameObject);
 			muzzleflash.Activate();
 			transform.localPosition -= Vector3.forward * Random.Range(kickbackMinMax.x, kickbackMinMax.y);
 			recoilAngle += Random.Range(recoilAngleMinMax.x, recoilAngleMinMax.y);
