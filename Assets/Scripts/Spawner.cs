@@ -27,19 +27,21 @@ public class Spawner : MonoBehaviour {
 	public event System.Action<int> OnNewWave;
 
 	public static Spawner Create() {
+		int seed = FindObjectOfType<GameManager> ().seed;
+		System.Random rand = new System.Random (seed);
 		GameObject go = new GameObject ("Spawner");
 		Spawner spawner = go.AddComponent<Spawner> ();
 		spawner.enemy = ((GameObject)Resources.Load ("Enemy")).GetComponent<Enemy>();
 		Wave[] myWaves = new Wave[GameManager.waves];
 		for (int i = 0; i < myWaves.Length; i++) {
 			myWaves[i] = new Wave ();
-			myWaves[i].enemyCount = (int)Random.Range(3 * (i + 1), 5 * (i+ 1));
-			myWaves[i].timeBetweenSpawns = Random.Range(.2f, 1f);
+			myWaves[i].enemyCount = (int)(3 * (i + 1) + rand.NextDouble() * 2 * (i + 1));
+			myWaves[i].timeBetweenSpawns = (float)(0.2f + 0.8f * rand.NextDouble());
 
 			myWaves[i].moveSpeed = 2f + 0.2f * i;
 			myWaves[i].damage = (int)(20 * Mathf.Log(i + 3) / (i + 1));
 			myWaves[i].health = (int)(i / 5 + 1);
-			myWaves[i].skinColor = new Color(Random.Range(0,1f),Random.Range(0,1f),Random.Range(0,1f));
+			myWaves[i].skinColor = new Color((float)(rand.NextDouble()),(float)(rand.NextDouble()),(float)(rand.NextDouble()));
 		}
 		spawner.waves = myWaves;
 		return spawner;

@@ -1,8 +1,9 @@
 ﻿using UnityEngine;
 using UnityEngine.Networking;
+using System;
 using System.Collections;
 
-public class GameManager : MonoBehaviour {
+public class GameManager : NetworkBehaviour {
 
 	public static int waves = 30;
 	public bool devMode;
@@ -16,6 +17,9 @@ public class GameManager : MonoBehaviour {
 	private Spawner spawner;
 	private GameUI canvas;
 
+	[SyncVar]
+	public int seed;
+
 	void Awake () {
 		devMode = true;
 
@@ -25,5 +29,13 @@ public class GameManager : MonoBehaviour {
 		map = MapGenerator.Create();
 		map.GenerateMap ();
 		GameObject audioManager = Instantiate (Resources.Load ("AudioManager"), Vector3.zero, Quaternion.identity) as GameObject;
+	}
+
+	void Start () {
+		if (isServer) {
+			System.Random random = new System.Random ();
+			seed = random.Next ();
+		}
+		Debug.Log (seed);
 	}
 }

@@ -21,6 +21,8 @@ public class MapGenerator : MonoBehaviour {
 	Map currentMap;
 
 	public static MapGenerator Create() {
+		int seed = FindObjectOfType<GameManager> ().seed;
+		System.Random rand = new System.Random(seed);
 		MapGenerator generator = new GameObject ("Map").AddComponent<MapGenerator> ();
 		generator.tilePrefab = ((GameObject)Resources.Load ("Tile")).transform;
 		generator.obstaclePrefab = ((GameObject)Resources.Load ("Obstacle")).transform;
@@ -55,14 +57,14 @@ public class MapGenerator : MonoBehaviour {
 		Map[] myMaps = new Map[myMapSize];
 		for (int i = 0; i < myMapSize; i++) {
 			myMaps[i] = new Map();
-			myMaps[i].mapSize = new Coord((int)Random.Range(8, 14), (int)Random.Range(8, 14));
-			myMaps[i].obstaclePercent = Random.Range(0f, 5f * Mathf.Log(i+3) / myMapSize);
-			System.Random rand = new System.Random();
+			myMaps[i].mapSize = new Coord(rand.Next(8, 14), rand.Next(8, 14));
+			myMaps[i].obstaclePercent = (float)(rand.NextDouble() * 5f * Mathf.Log(i+3) / myMapSize);
+
 			myMaps[i].seed = rand.Next();
-			myMaps[i].minObstacleHeight = Random.Range(0.2f, 1f);
-			myMaps[i].maxObstacleHeight = myMaps[i].minObstacleHeight + Random.Range(0.2f, 3f);
-			myMaps[i].foregroundColor = new Color(Random.Range(0,1f),Random.Range(0,1f),Random.Range(0,1f));
-			myMaps[i].backgroundColor = new Color(Random.Range(0,1f),Random.Range(0,1f),Random.Range(0,1f));
+			myMaps[i].minObstacleHeight = (float)(0.2f + rand.NextDouble () * 0.8f);
+			myMaps[i].maxObstacleHeight = (float)(myMaps[i].minObstacleHeight + 0.2f + 2.8f * rand.NextDouble());
+			myMaps[i].foregroundColor = new Color((float)(rand.NextDouble()),(float)(rand.NextDouble()),(float)(rand.NextDouble()));
+			myMaps[i].backgroundColor = new Color((float)(rand.NextDouble()),(float)(rand.NextDouble()),(float)(rand.NextDouble()));
 		}
 		generator.maps = myMaps;
 		Spawner spawner = FindObjectOfType<Spawner> ();
