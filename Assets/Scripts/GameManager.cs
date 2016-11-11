@@ -24,10 +24,6 @@ public class GameManager : NetworkBehaviour {
 		devMode = true;
 
 		enemy = ((GameObject)Resources.Load ("Enemy")).GetComponent<Enemy> ();
-		spawner = Spawner.Create ();
-		spawner.devMode = devMode;
-		map = MapGenerator.Create();
-		map.GenerateMap ();
 		GameObject audioManager = Instantiate (Resources.Load ("AudioManager"), Vector3.zero, Quaternion.identity) as GameObject;
 	}
 
@@ -36,6 +32,11 @@ public class GameManager : NetworkBehaviour {
 			System.Random random = new System.Random ();
 			seed = random.Next ();
 		}
-		Debug.Log (seed);
+		if(isClient) {
+			spawner = Spawner.Create ();
+			spawner.devMode = devMode;
+			map = MapGenerator.Create();
+			map.GenerateMap ();
+		}
 	}
 }

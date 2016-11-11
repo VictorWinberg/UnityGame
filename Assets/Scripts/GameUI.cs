@@ -17,6 +17,13 @@ public class GameUI : MonoBehaviour {
 		}
 	}
 
+	public Spawner setSpawner {
+		set {
+			spawner = value;
+			spawner.OnNewWave += OnNewWave;
+		}
+	}
+
 	public RectTransform waveBanner, healthbar;
 	public Text waveTitle, waveEnemyCount, scoreUI, gameOverScore, healthbarHp;
 
@@ -27,8 +34,6 @@ public class GameUI : MonoBehaviour {
 	
 	void Start () {
 		manager = FindObjectOfType<GameManager>();
-		spawner = FindObjectOfType<Spawner>();
-		spawner.OnNewWave += OnNewWave;
 	}
 
 	void OnChangeHealth() {

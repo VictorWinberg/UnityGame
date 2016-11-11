@@ -50,6 +50,7 @@ public class Spawner : MonoBehaviour {
 	void Start () {
 		isDisabled = true;
 		map = FindObjectOfType<MapGenerator> ();
+		FindObjectOfType<GameUI> ().setSpawner = this;
 	}
 
 	public Player setPlayer {
@@ -137,7 +138,8 @@ public class Spawner : MonoBehaviour {
 	}
 
 	void ResetPlayerPosition() {
-		player.transform.position = map.getTileFromPosition(Vector3.zero).position + Vector3.up * 1.5f;
+		if(player != null)
+			player.transform.position = map.getTileFromPosition(Vector3.zero).position + Vector3.up * 1.5f;
 	}
 
 	void NextWave() {

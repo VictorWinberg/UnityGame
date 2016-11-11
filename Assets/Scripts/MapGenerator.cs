@@ -21,7 +21,9 @@ public class MapGenerator : MonoBehaviour {
 	Map currentMap;
 
 	public static MapGenerator Create() {
-		int seed = FindObjectOfType<GameManager> ().seed;
+		GameManager gm = FindObjectOfType<GameManager> ();
+
+		int seed = gm == null ? (int)(Random.value * 1000000) : gm.seed;
 		System.Random rand = new System.Random(seed);
 		MapGenerator generator = new GameObject ("Map").AddComponent<MapGenerator> ();
 		generator.tilePrefab = ((GameObject)Resources.Load ("Tile")).transform;

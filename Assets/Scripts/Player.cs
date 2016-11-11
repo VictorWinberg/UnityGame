@@ -15,7 +15,7 @@ public class Player : LivingEntity {
 
 	private bool aimbot = false;
 
-	void Start () {
+	protected override void Start () {
 		if (!isLocalPlayer)
 			return;
 
