@@ -44,6 +44,17 @@ public class Gun : NetworkBehaviour {
 		reloading = false;
 	}
 
+	[SyncVar(hook="HoldGun")]
+	public NetworkInstanceId parentNetId;
+
+	public void HoldGun(NetworkInstanceId _parentNetId) {
+		parentNetId = _parentNetId;
+		GameObject parentObject = ClientScene.FindLocalObject(parentNetId);
+		transform.SetParent(parentObject.transform.FindChild("Weapon Hold"));
+		transform.localRotation = Quaternion.identity;
+		transform.localPosition = Vector3.zero;
+	}
+
 	void LateUpdate() {
 		// Animate the recoil
 		transform.localPosition = Vector3.SmoothDamp (transform.localPosition, Vector3.zero, ref recoilSmoothDampVelocity, recoilRecoverTime);

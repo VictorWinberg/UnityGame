@@ -1,7 +1,8 @@
 ﻿using UnityEngine;
+using UnityEngine.Networking;
 using System.Collections;
 
-public class Spawner : MonoBehaviour {
+public class Spawner : NetworkBehaviour {
 
 	public bool devMode;
 
@@ -16,7 +17,7 @@ public class Spawner : MonoBehaviour {
 	int enemiesRemainingToSpawn, enemiesRemainingAlive;
 	float nextSpawnTime;
 
-	MapGenerator map;
+	public MapGenerator map;
 
 	float idleTimeCheck = 2;
 	float idleThresholdDistance = 1.5f;
@@ -24,11 +25,12 @@ public class Spawner : MonoBehaviour {
 	Vector3 idlePositionPrevious;
 	bool isIdle, isDisabled, isFrozen;
 
-	public event System.Action<int> OnNewWave;
+	private InGameManager igm;
 
 	public static Spawner Create() {
-		int seed = FindObjectOfType<GameManager> ().seed;
-		System.Random rand = new System.Random (seed);
+		InGameManager s = FindObjectOfType<InGameManager> ();
+		System.Random rand = new System.Random (s.seed);
+
 		GameObject go = new GameObject ("Spawner");
 		Spawner spawner = go.AddComponent<Spawner> ();
 		spawner.enemy = ((GameObject)Resources.Load ("Enemy")).GetComponent<Enemy>();
@@ -50,18 +52,21 @@ public class Spawner : MonoBehaviour {
 	void Start () {
 		isDisabled = true;
 		map = FindObjectOfType<MapGenerator> ();
-		FindObjectOfType<GameUI> ().setSpawner = this;
+		igm = FindObjectOfType<InGameManager> ();
 	}
 
 	public Player setPlayer {
-		set 
-		{
+		set {
 			Cursor.visible = false;
 			player = value;
 			nextIdleTimeCheck = idleTimeCheck + Time.time;
 			idlePositionPrevious = player.transform.position;
 			player.OnDeath += OnPlayerDeath;
 			isDisabled = false;
+
+			map = FindObjectOfType<MapGenerator> ();
+			igm = FindObjectOfType<InGameManager> ();
+
 			NextWave ();
 		}
 	}
@@ -138,8 +143,7 @@ public class Spawner : MonoBehaviour {
 	}
 
 	void ResetPlayerPosition() {
-		if(player != null)
-			player.transform.position = map.getTileFromPosition(Vector3.zero).position + Vector3.up * 1.5f;
+		player.transform.position = map.getTileFromPosition(Vector3.zero).position + Vector3.up * 1.5f;
 	}
 
 	void NextWave() {
@@ -154,7 +158,7 @@ public class Spawner : MonoBehaviour {
 			enemiesRemainingToSpawn = currentWave.enemyCount;
 			enemiesRemainingAlive = enemiesRemainingToSpawn;
 
-			if(OnNewWave != null) OnNewWave(currentWaveNumber);
+			igm.NewWave(currentWaveNumber);
 			ResetPlayerPosition();
 		}
 	}

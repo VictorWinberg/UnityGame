@@ -14,22 +14,26 @@ public class GunController : NetworkBehaviour {
 			Destroy(gun.gameObject);
 		}
 		gun = (Gun)Instantiate (gunToEquip, weaponHold.position, weaponHold.rotation);
+		gun.parentNetId = weaponHold.parent.GetComponent<NetworkIdentity> ().netId;
 		gun.transform.parent = weaponHold;
 		NetworkServer.Spawn (gun.gameObject);
 	}
 
-	public void EquipGun(int gunIndex) {
+	[Command]
+	public void CmdEquipGun(int gunIndex) {
 		this.gunIndex = gunIndex;
 		EquipGun (guns [gunIndex % guns.Length]);
 	}
 
-	public void OnTriggerHold (){
+	[Command]
+	public void CmdOnTriggerHold (){
 		if (gun != null) {
 			gun.OnTriggerHold ();
 		}
 	}
 
-	public void OnTriggerRelease() {
+	[Command]
+	public void CmdOnTriggerRelease() {
 		if (gun != null) {
 			gun.OnTriggerRelease ();
 		}
@@ -47,7 +51,8 @@ public class GunController : NetworkBehaviour {
 		}
 	}
 
-	public void Reload() {
+	[Command]
+	public void CmdReload() {
 		if (gun != null) {
 			gun.Reload ();
 		}

@@ -16,8 +16,10 @@ public class Player : LivingEntity {
 	private bool aimbot = false;
 
 	protected override void Start () {
-		if (!isLocalPlayer)
+		if (!isLocalPlayer) {
+			Destroy (this);
 			return;
+		}
 
 		startingHealth = 80;
 
@@ -27,8 +29,9 @@ public class Player : LivingEntity {
 		gunController = GetComponent<GunController> ();
 		crosshairs = FindObjectOfType<Crosshairs> ();
 		viewCamera = Camera.main;
+		InGameManager igm = FindObjectOfType<InGameManager> ();
+		igm.OnNewWave += OnNewWave;
 		Spawner spawner = FindObjectOfType<Spawner> ();
-		spawner.OnNewWave += OnNewWave;
 		spawner.setPlayer = this;
 		FindObjectOfType<GameUI> ().setPlayer = this;
 		FindObjectOfType<Scoreboard> ().setPlayer = this;
@@ -75,13 +78,13 @@ public class Player : LivingEntity {
 				crosshairs.DetectTargets (!point.Equals (closest));
 				LookAtTarget (closest);
 			}
-			gunController.OnTriggerHold();
+			gunController.CmdOnTriggerHold();
 		}
 		if (Input.GetMouseButtonUp(0)) {
-			gunController.OnTriggerRelease();
+			gunController.CmdOnTriggerRelease();
 		}
 		if (Input.GetKeyDown (KeyCode.R)) {
-			gunController.Reload();
+			gunController.CmdReload();
 		}
 		if (devMode) {
 			if(Input.GetKeyDown (KeyCode.G)) aimbot = !aimbot;
@@ -92,7 +95,7 @@ public class Player : LivingEntity {
 	void OnNewWave(int waveNumber) {
 		if (waveNumber != 1) startingHealth = (int)(startingHealth * 1.2f);
 		health = startingHealth;
-		gunController.EquipGun (waveNumber - 1);
+		gunController.CmdEquipGun (waveNumber - 1);
 	}
 
 	void LookAtTarget (Vector3 point) {

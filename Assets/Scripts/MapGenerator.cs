@@ -21,10 +21,9 @@ public class MapGenerator : MonoBehaviour {
 	Map currentMap;
 
 	public static MapGenerator Create() {
-		GameManager gm = FindObjectOfType<GameManager> ();
+		InGameManager igm = FindObjectOfType<InGameManager> ();
+		System.Random rand = new System.Random(igm == null ? (int)(1000000 * Random.value) : igm.seed);
 
-		int seed = gm == null ? (int)(Random.value * 1000000) : gm.seed;
-		System.Random rand = new System.Random(seed);
 		MapGenerator generator = new GameObject ("Map").AddComponent<MapGenerator> ();
 		generator.tilePrefab = ((GameObject)Resources.Load ("Tile")).transform;
 		generator.obstaclePrefab = ((GameObject)Resources.Load ("Obstacle")).transform;
@@ -70,7 +69,8 @@ public class MapGenerator : MonoBehaviour {
 		}
 		generator.maps = myMaps;
 		Spawner spawner = FindObjectOfType<Spawner> ();
-			if(spawner != null) spawner.OnNewWave += generator.OnNewWave;
+
+		if(igm != null && spawner != null) igm.OnNewWave += generator.OnNewWave;
 		return generator;
 	}
 
@@ -271,6 +271,17 @@ public class MapGenerator : MonoBehaviour {
 
 		public static bool operator != (Coord c1, Coord c2) {
 			return !(c1 == c2);
+		}
+
+		public override bool Equals (object obj) {
+			if(obj is Coord) {
+				return this == ((Coord)obj);
+			}
+			return false;
+		}
+
+		public override int GetHashCode () {
+			return base.GetHashCode ();
 		}
 	}
 

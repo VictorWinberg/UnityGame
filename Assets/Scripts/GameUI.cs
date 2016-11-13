@@ -8,6 +8,8 @@ public class GameUI : MonoBehaviour {
 	public Image fadeCanvas;
 	public GameObject gameOverUI;
 
+	private InGameManager igm;
+
 	public Player setPlayer {
 		set {
 			player = value;
@@ -17,10 +19,11 @@ public class GameUI : MonoBehaviour {
 		}
 	}
 
-	public Spawner setSpawner {
+	public InGameManager setIGM {
 		set {
-			spawner = value;
-			spawner.OnNewWave += OnNewWave;
+			igm = value;
+			spawner = FindObjectOfType<Spawner> ();
+			igm.OnNewWave += OnNewWave;
 		}
 	}
 
@@ -50,7 +53,7 @@ public class GameUI : MonoBehaviour {
 		waveTitle.text = "- Wave " + HumanFriendlyInteger.IntegerToWritten (waveNumber) + " -";
 		string enemyCount = (spawner.waves [waveNumber - 1].infinite) ? "Infinite" : spawner.waves [waveNumber - 1].enemyCount + "";
 		//enemyCount += " | Health: " + (int)(manager.getPlayer ().getHealth ()) + " | Mode: " + manager.getPlayer ().getGun ().fireMode;
-		waveEnemyCount.text = "Enemies: " + enemyCount;
+		waveEnemyCount.text = "Enemies: " + enemyCount + " | Seed: " + igm.seed;
 		StopCoroutine ("AnimateWaveBanner");
 		StartCoroutine ("AnimateWaveBanner");
 	}
@@ -81,7 +84,7 @@ public class GameUI : MonoBehaviour {
 	void OnGameOver () {
 		Cursor.visible = true;
 		StartCoroutine(Fade(Color.clear, new Color(1, 1, 1, .8f), 1));
-		gameOverScore.text = scoreUI.text;
+		gameOverScore.text = "Score: " + scoreUI.text + "\nSeed: " + FindObjectOfType<InGameManager>().seed;
 		scoreUI.gameObject.SetActive (false);
 		healthbar.transform.parent.gameObject.SetActive (false);
 		gameOverUI.SetActive (true);

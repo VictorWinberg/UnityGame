@@ -3,40 +3,72 @@ using UnityEngine.Networking;
 using System;
 using System.Collections;
 
-public class GameManager : NetworkBehaviour {
+public class GameManager : NetworkManager {
 
 	public static int waves = 30;
 	public bool devMode;
 
-	private GameObject camera;
 	private MapGenerator map;
-	private Scoreboard scoreboard;
-	private Crosshairs crosshairs;
-	private Player player;
-	private Enemy enemy;
 	private Spawner spawner;
-	private GameUI canvas;
+	private GameObject seed;
+	private bool preview = true;
 
-	[SyncVar]
-	public int seed;
-
-	void Awake () {
+	void Awake() {
 		devMode = true;
-
-		enemy = ((GameObject)Resources.Load ("Enemy")).GetComponent<Enemy> ();
-		GameObject audioManager = Instantiate (Resources.Load ("AudioManager"), Vector3.zero, Quaternion.identity) as GameObject;
+		setPreview (preview);
 	}
 
-	void Start () {
-		if (isServer) {
-			System.Random random = new System.Random ();
-			seed = random.Next ();
+	public override void OnStartClient(NetworkClient client) {
+		base.OnStartClient (client);
+		Debug.Log ("OnStartClient");
+		setPreview(false);
+	}
+
+	public override void OnStartHost (){
+		base.OnStartHost ();
+		Debug.Log ("OnStartHost");
+		setPreview(false);
+	}
+
+	public override void OnStopClient () {
+		base.OnStopClient ();
+		Debug.Log ("OnStopClient");
+		setPreview(true);
+	}
+
+	public override void OnStopHost () {
+		base.OnStopHost ();
+		Debug.Log ("OnStopHost");
+		setPreview(true);
+	}
+
+	float starttime = 3f;
+	float timer = 0;
+
+	void Update() {
+		if (preview) {
+			map.transform.RotateAround (Vector3.zero, Vector3.up, .3f);
+
+			timer += Time.deltaTime;
+			if (timer > starttime) {
+				timer = 0;
+				map.mapIndex++;
+				Quaternion rotation = map.transform.rotation;
+				map.transform.rotation = Quaternion.identity;
+				map.GenerateMap ();
+				map.transform.rotation = rotation;
+			}
 		}
-		if(isClient) {
-			spawner = Spawner.Create ();
-			spawner.devMode = devMode;
-			map = MapGenerator.Create();
+	}
+
+	void setPreview(bool value) {
+		if (value) {
+			map = MapGenerator.Create ();
 			map.GenerateMap ();
+		} else {
+			Destroy (map.gameObject);
 		}
+
+		preview = value;
 	}
 }
