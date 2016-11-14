@@ -128,6 +128,7 @@ public class Spawner : NetworkBehaviour {
 		spawnedEnemy.OnDeath += OnEnemyDeath;
 
 		spawnedEnemy.SetCharacteristics (isFrozen ? 0 : currentWave.moveSpeed, currentWave.damage, currentWave.health, currentWave.skinColor);
+		NetworkServer.Spawn (spawnedEnemy.gameObject);
 	}
 
 	void OnPlayerDeath() {

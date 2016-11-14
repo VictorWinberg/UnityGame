@@ -7,6 +7,9 @@ public class InGameManager : NetworkBehaviour {
 	[SyncVar]
 	public int seed;
 
+	[SyncVar(hook="NewWave")]
+	public int wave;
+
 	public event System.Action<int> OnNewWave;
 
 	void Start () {
@@ -25,6 +28,7 @@ public class InGameManager : NetworkBehaviour {
 	}
 
 	public void NewWave(int wave) {
+		this.wave = wave;
 		OnNewWave (wave);
 	}
 }

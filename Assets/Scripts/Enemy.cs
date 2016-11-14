@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.Networking;
 using System.Collections;
 
 [RequireComponent (typeof (NavMeshAgent))]
@@ -13,6 +14,7 @@ public class Enemy : LivingEntity {
 	NavMeshAgent pathfinder;
 	Transform target;
 	LivingEntity targetEntity;
+
 	Material skinMaterial;
 
 	Color originalColour;
@@ -21,9 +23,14 @@ public class Enemy : LivingEntity {
 	float timeBetweenAttacks = 1;
 	float damage = 1;
 	
-	float nextAttackTime, myCollisionRadius, targetCollisionRadius, moveSpeed, angularSpeed;
+	float nextAttackTime, myCollisionRadius, targetCollisionRadius;
+
+	[SyncVar]
+	float moveSpeed, angularSpeed;
 
 	bool hasTarget;
+	[SyncVar(hook="Freeze")]
+	bool isFreeze;
 
 	void Awake() {
 		pathfinder = GetComponent<NavMeshAgent> ();
@@ -42,6 +49,7 @@ public class Enemy : LivingEntity {
 
 	protected override void Start () {
 		base.Start ();
+		Freeze (isFreeze);
 
 		if (hasTarget) {
 			currentState = State.Chasing;
@@ -83,6 +91,9 @@ public class Enemy : LivingEntity {
 	}
 
 	void Update () {
+		if (!isServer)
+			return;
+		
 		if (hasTarget) {
 			if (Time.time > nextAttackTime) {
 				float sqrDstToTarget = (target.position - transform.position).sqrMagnitude;
@@ -109,7 +120,7 @@ public class Enemy : LivingEntity {
 		
 		float attackSpeed = 3;
 		float percent = 0;
-		
+
 		skinMaterial.color = Color.red;
 		bool hasAppliedDamage = false;
 		
@@ -148,6 +159,7 @@ public class Enemy : LivingEntity {
 	}
 
 	public void Freeze(bool freeze) {
+		this.isFreeze = freeze;
 		if (freeze) {
 			pathfinder.speed = 0;
 			pathfinder.angularSpeed = 0;

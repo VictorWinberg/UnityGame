@@ -17,7 +17,7 @@ public class Player : LivingEntity {
 
 	protected override void Start () {
 		if (!isLocalPlayer) {
-			Destroy (this);
+			Destroy(transform.FindChild ("View Visualisation").gameObject);
 			return;
 		}
 
@@ -42,8 +42,9 @@ public class Player : LivingEntity {
 	}
 
 	void Update () {
-		if (!isLocalPlayer)
+		if (!isLocalPlayer) {
 			return;
+		}
 
 		// Movement input
 		Vector3 moveInput = new Vector3 (Input.GetAxisRaw ("Horizontal"), 0, Input.GetAxisRaw ("Vertical"));
