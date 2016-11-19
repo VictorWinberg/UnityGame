@@ -1,74 +1,34 @@
 ﻿using UnityEngine;
 using UnityEngine.Networking;
-using System;
 using System.Collections;
 
-public class GameManager : NetworkManager {
+public class GameManager : NetworkBehaviour {
 
-	public static int waves = 30;
-	public bool devMode;
+	[SyncVar]
+	public int seed;
 
-	private MapGenerator map;
-	private Spawner spawner;
-	private GameObject seed;
-	private bool preview = true;
+	[SyncVar(hook="NewWave")]
+	public int wave;
 
-	void Awake() {
-		devMode = true;
-		setPreview (preview);
-	}
+	public event System.Action<int> OnNewWave;
 
-	public override void OnStartClient(NetworkClient client) {
-		base.OnStartClient (client);
-		Debug.Log ("OnStartClient");
-		setPreview(false);
-	}
-
-	public override void OnStartHost (){
-		base.OnStartHost ();
-		Debug.Log ("OnStartHost");
-		setPreview(false);
-	}
-
-	public override void OnStopClient () {
-		base.OnStopClient ();
-		Debug.Log ("OnStopClient");
-		setPreview(true);
-	}
-
-	public override void OnStopHost () {
-		base.OnStopHost ();
-		Debug.Log ("OnStopHost");
-		setPreview(true);
-	}
-
-	float starttime = 3f;
-	float timer = 0;
-
-	void Update() {
-		if (preview) {
-			map.transform.RotateAround (Vector3.zero, Vector3.up, .3f);
-
-			timer += Time.deltaTime;
-			if (timer > starttime) {
-				timer = 0;
-				map.mapIndex++;
-				Quaternion rotation = map.transform.rotation;
-				map.transform.rotation = Quaternion.identity;
-				map.GenerateMap ();
-				map.transform.rotation = rotation;
-			}
+	void Start () {
+		NetworkManagerExt gm = FindObjectOfType<NetworkManagerExt> ();
+		if (isServer) {
+			System.Random random = new System.Random ();
+			seed = random.Next ();
 		}
-	}
-
-	void setPreview(bool value) {
-		if (value) {
-			map = MapGenerator.Create ();
+		if(isClient) {
+			Spawner spawner = Spawner.Create ();
+			spawner.devMode = gm.devMode;
+			MapGenerator map = MapGenerator.Create();
 			map.GenerateMap ();
-		} else {
-			Destroy (map.gameObject);
+			FindObjectOfType<GameUI> ().setIGM = this;
 		}
+	}
 
-		preview = value;
+	public void NewWave(int wave) {
+		this.wave = wave;
+		OnNewWave (wave);
 	}
 }

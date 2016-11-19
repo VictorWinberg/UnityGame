@@ -8,7 +8,7 @@ public class GameUI : MonoBehaviour {
 	public Image fadeCanvas;
 	public GameObject gameOverUI;
 
-	private InGameManager igm;
+	private GameManager igm;
 
 	public Player setPlayer {
 		set {
@@ -19,7 +19,7 @@ public class GameUI : MonoBehaviour {
 		}
 	}
 
-	public InGameManager setIGM {
+	public GameManager setIGM {
 		set {
 			igm = value;
 			spawner = FindObjectOfType<Spawner> ();
@@ -30,13 +30,13 @@ public class GameUI : MonoBehaviour {
 	public RectTransform waveBanner, healthbar;
 	public Text waveTitle, waveEnemyCount, scoreUI, gameOverScore, healthbarHp;
 
-	private GameManager manager;
+	private NetworkManagerExt manager;
 
 	Spawner spawner;
 	Player player;
 	
 	void Start () {
-		manager = FindObjectOfType<GameManager>();
+		manager = FindObjectOfType<NetworkManagerExt>();
 	}
 
 	void OnChangeHealth() {
@@ -84,7 +84,7 @@ public class GameUI : MonoBehaviour {
 	void OnGameOver () {
 		Cursor.visible = true;
 		StartCoroutine(Fade(Color.clear, new Color(1, 1, 1, .8f), 1));
-		gameOverScore.text = "Score: " + scoreUI.text + "\nSeed: " + FindObjectOfType<InGameManager>().seed;
+		gameOverScore.text = "Score: " + scoreUI.text + "\nSeed: " + FindObjectOfType<GameManager>().seed;
 		scoreUI.gameObject.SetActive (false);
 		healthbar.transform.parent.gameObject.SetActive (false);
 		gameOverUI.SetActive (true);

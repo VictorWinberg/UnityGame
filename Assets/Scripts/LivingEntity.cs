@@ -13,7 +13,7 @@ public abstract class LivingEntity : NetworkBehaviour, IDamageable {
 
 	protected virtual void Start() {
 		health = startingHealth;
-		devMode = FindObjectOfType<GameManager> ().devMode;
+		devMode = FindObjectOfType<NetworkManagerExt> ().devMode;
 	}
 
 	public virtual void TakeHit (float damage, Vector3 hitPoint, Vector3 hitDirection) {

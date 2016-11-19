@@ -29,7 +29,7 @@ public class Player : LivingEntity {
 		gunController = GetComponent<GunController> ();
 		crosshairs = FindObjectOfType<Crosshairs> ();
 		viewCamera = Camera.main;
-		InGameManager igm = FindObjectOfType<InGameManager> ();
+		GameManager igm = FindObjectOfType<GameManager> ();
 		igm.OnNewWave += OnNewWave;
 		Spawner spawner = FindObjectOfType<Spawner> ();
 		spawner.setPlayer = this;

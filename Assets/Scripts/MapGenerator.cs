@@ -21,7 +21,7 @@ public class MapGenerator : MonoBehaviour {
 	Map currentMap;
 
 	public static MapGenerator Create() {
-		InGameManager igm = FindObjectOfType<InGameManager> ();
+		GameManager igm = FindObjectOfType<GameManager> ();
 		System.Random rand = new System.Random(igm == null ? (int)(1000000 * Random.value) : igm.seed);
 
 		MapGenerator generator = new GameObject ("Map").AddComponent<MapGenerator> ();
@@ -54,7 +54,7 @@ public class MapGenerator : MonoBehaviour {
 		Destroy (navmeshFloor.gameObject.GetComponent<MeshCollider> ());
 		generator.navmeshFloor = navmeshFloor.transform;
 
-		int myMapSize = GameManager.waves;
+		int myMapSize = NetworkManagerExt.waves;
 		Map[] myMaps = new Map[myMapSize];
 		for (int i = 0; i < myMapSize; i++) {
 			myMaps[i] = new Map();

@@ -25,16 +25,16 @@ public class Spawner : NetworkBehaviour {
 	Vector3 idlePositionPrevious;
 	bool isIdle, isDisabled, isFrozen;
 
-	private InGameManager igm;
+	private GameManager igm;
 
 	public static Spawner Create() {
-		InGameManager s = FindObjectOfType<InGameManager> ();
+		GameManager s = FindObjectOfType<GameManager> ();
 		System.Random rand = new System.Random (s.seed);
 
 		GameObject go = new GameObject ("Spawner");
 		Spawner spawner = go.AddComponent<Spawner> ();
 		spawner.enemy = ((GameObject)Resources.Load ("Enemy")).GetComponent<Enemy>();
-		Wave[] myWaves = new Wave[GameManager.waves];
+		Wave[] myWaves = new Wave[NetworkManagerExt.waves];
 		for (int i = 0; i < myWaves.Length; i++) {
 			myWaves[i] = new Wave ();
 			myWaves[i].enemyCount = (int)(3 * (i + 1) + rand.NextDouble() * 2 * (i + 1));
@@ -52,7 +52,7 @@ public class Spawner : NetworkBehaviour {
 	void Start () {
 		isDisabled = true;
 		map = FindObjectOfType<MapGenerator> ();
-		igm = FindObjectOfType<InGameManager> ();
+		igm = FindObjectOfType<GameManager> ();
 	}
 
 	public Player setPlayer {
@@ -65,7 +65,7 @@ public class Spawner : NetworkBehaviour {
 			isDisabled = false;
 
 			map = FindObjectOfType<MapGenerator> ();
-			igm = FindObjectOfType<InGameManager> ();
+			igm = FindObjectOfType<GameManager> ();
 
 			NextWave ();
 		}
