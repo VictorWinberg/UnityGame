@@ -21,7 +21,7 @@ public class MapGenerator : MonoBehaviour {
 	Map currentMap;
 
 	public static MapGenerator Create() {
-		GameManager igm = FindObjectOfType<GameManager> ();
+		SyncManager igm = FindObjectOfType<SyncManager> ();
 		System.Random rand = new System.Random(igm == null ? (int)(1000000 * Random.value) : igm.seed);
 
 		MapGenerator generator = new GameObject ("Map").AddComponent<MapGenerator> ();

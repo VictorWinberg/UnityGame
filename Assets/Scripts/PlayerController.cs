@@ -6,14 +6,16 @@ public class PlayerController : MonoBehaviour {
 
 	Vector3 velocity;
 	Rigidbody body;
+	GunController gun;
 
 	void Start () {
 		body = GetComponent<Rigidbody> ();
+		gun = GetComponent<GunController> ();
 	}
 
 	void FixedUpdate () {
 		body.MovePosition (body.position + velocity * Time.fixedDeltaTime);
-		
+		LookAt (gun.point);
 	}
 
 	public void Move(Vector3 velocity) {

@@ -1,34 +1,51 @@
 ﻿using UnityEngine;
-using UnityEngine.Networking;
-using System.Collections;
+using System.Collections.Generic;
 
-public class GameManager : NetworkBehaviour {
+/* Identical to MultiplayerFPS */
+public class GameManager : MonoBehaviour {
 
-	[SyncVar]
-	public int seed;
+	public static GameManager instance;
+	public MatchSettings matchSettings;
+	public bool devMode, aimbot;
 
-	[SyncVar(hook="NewWave")]
-	public int wave;
+	[SerializeField]
+	private GameObject sceneCamera;
 
-	public event System.Action<int> OnNewWave;
-
-	void Start () {
-		NetworkManagerExt gm = FindObjectOfType<NetworkManagerExt> ();
-		if (isServer) {
-			System.Random random = new System.Random ();
-			seed = random.Next ();
-		}
-		if(isClient) {
-			Spawner spawner = Spawner.Create ();
-			spawner.devMode = gm.devMode;
-			MapGenerator map = MapGenerator.Create();
-			map.GenerateMap ();
-			FindObjectOfType<GameUI> ().setIGM = this;
+	void Awake (){
+		if (instance != null) {
+			Debug.LogError("More than one GameManager in scene.");
+		} else {
+			instance = this;
 		}
 	}
 
-	public void NewWave(int wave) {
-		this.wave = wave;
-		OnNewWave (wave);
+	public void SetSceneCameraActive (bool isActive) {
+		if (sceneCamera == null)
+			return;
+
+		sceneCamera.SetActive(isActive);
 	}
+
+	#region Player tracking
+
+	private const string PLAYER_ID_PREFIX = "Player ";
+
+	private static Dictionary<string, Player> players = new Dictionary<string, Player>();
+
+	public static void RegisterPlayer (string _netID, Player _player) {
+		string _playerID = PLAYER_ID_PREFIX + _netID;
+		players.Add(_playerID, _player);
+		_player.transform.name = _playerID;
+	}
+
+	public static void UnRegisterPlayer (string _playerID) {
+		players.Remove(_playerID);
+	}
+
+	public static Player GetPlayer (string _playerID) {
+		return players[_playerID];
+	}
+
+	#endregion
+
 }

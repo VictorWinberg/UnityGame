@@ -25,10 +25,10 @@ public class Spawner : NetworkBehaviour {
 	Vector3 idlePositionPrevious;
 	bool isIdle, isDisabled, isFrozen;
 
-	private GameManager igm;
+	private SyncManager igm;
 
 	public static Spawner Create() {
-		GameManager s = FindObjectOfType<GameManager> ();
+		SyncManager s = FindObjectOfType<SyncManager> ();
 		System.Random rand = new System.Random (s.seed);
 
 		GameObject go = new GameObject ("Spawner");
@@ -52,7 +52,7 @@ public class Spawner : NetworkBehaviour {
 	void Start () {
 		isDisabled = true;
 		map = FindObjectOfType<MapGenerator> ();
-		igm = FindObjectOfType<GameManager> ();
+		igm = SyncManager.instance;
 	}
 
 	public Player setPlayer {
@@ -65,7 +65,7 @@ public class Spawner : NetworkBehaviour {
 			isDisabled = false;
 
 			map = FindObjectOfType<MapGenerator> ();
-			igm = FindObjectOfType<GameManager> ();
+			igm = FindObjectOfType<SyncManager> ();
 
 			NextWave ();
 		}
@@ -132,7 +132,7 @@ public class Spawner : NetworkBehaviour {
 	}
 
 	void OnPlayerDeath() {
-		isDisabled = true;
+		//isDisabled = true;
 	}
 
 	void OnEnemyDeath (){

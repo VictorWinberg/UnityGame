@@ -4,24 +4,23 @@ using System.Collections;
 
 public abstract class LivingEntity : NetworkBehaviour, IDamageable {
 
+	[SerializeField]
 	public float startingHealth { get; protected set; }
+
 	[SyncVar(hook = "ChangeHealth")]
 	protected float health;
-	protected bool dead, devMode;
+
+	protected bool dead;
 
 	public event System.Action OnDeath, OnChangeHealth;
 
-	protected virtual void Start() {
-		health = startingHealth;
-		devMode = FindObjectOfType<NetworkManagerExt> ().devMode;
-	}
-
 	public virtual void TakeHit (float damage, Vector3 hitPoint, Vector3 hitDirection) {
 		// Do some stuff here with hit var
-		TakeDamage (damage);
+		RpcTakeDamage (damage);
 	}
 
-	public virtual void TakeDamage (float damage) {
+	[ClientRpc]
+	public virtual void RpcTakeDamage (float damage) {
 		health -= damage;
 		
 		if (health <= 0 && !dead) {
@@ -49,6 +48,5 @@ public abstract class LivingEntity : NetworkBehaviour, IDamageable {
 		if (OnDeath != null) {
 			OnDeath ();
 		}
-		GameObject.Destroy (gameObject);
 	}
 }

@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Networking;
 using System.Collections;
 
 [RequireComponent (typeof (PlayerController))]
@@ -7,42 +8,59 @@ public class Player : LivingEntity {
 
 	public float moveSpeed = 5;
 
-	public Crosshairs  crosshairs;
-
-	protected Camera viewCamera;
 	PlayerController controller;
 	GunController gunController;
 
+	[SerializeField]
+	private Behaviour[] disableOnDeath;
+	private bool[] wasEnabled;
+
+	[SerializeField]
+	private GameObject[] disableGameObjectsOnDeath;
+
+	private bool firstSetup = true;
 	private bool aimbot = false;
 
-	protected override void Start () {
-		if (!isLocalPlayer) {
-			Destroy(transform.FindChild ("View Visualisation").gameObject);
-			return;
+	public void SetupPlayer () {
+		if (isLocalPlayer) {
+			//Switch cameras
+			GameManager.instance.SetSceneCameraActive(false);
+			GetComponent<PlayerSetup>().gameUI.SetActive(true);
 		}
 
-		startingHealth = 80;
-
-		base.Start ();
-
-		controller = GetComponent<PlayerController> ();
-		gunController = GetComponent<GunController> ();
-		crosshairs = FindObjectOfType<Crosshairs> ();
-		viewCamera = Camera.main;
-		GameManager igm = FindObjectOfType<GameManager> ();
-		igm.OnNewWave += OnNewWave;
-		Spawner spawner = FindObjectOfType<Spawner> ();
-		spawner.setPlayer = this;
-		FindObjectOfType<GameUI> ().setPlayer = this;
-		FindObjectOfType<Scoreboard> ().setPlayer = this;
+		CmdBroadCastNewPlayerSetup();
 	}
 
+	[Command]
+	private void CmdBroadCastNewPlayerSetup () {
+		RpcSetupPlayerOnAllClients();
+	}
+
+	[ClientRpc]
+	private void RpcSetupPlayerOnAllClients () {
+		if (firstSetup) {
+			wasEnabled = new bool[disableOnDeath.Length];
+			for (int i = 0; i < wasEnabled.Length; i++) {
+				wasEnabled[i] = disableOnDeath[i].enabled;
+			}
+
+			firstSetup = false;
+		}
+
+		SetDefaults();
+	}
+
+	// TODO: Fix
 	public override void OnStartLocalPlayer () {
 		GetComponent<MeshRenderer>().material.color = Color.blue;
 	}
 
+	void Start() {
+		controller = GetComponent<PlayerController> ();
+	}
+
 	void Update () {
-		if (!isLocalPlayer) {
+		if (!isLocalPlayer || PauseMenu.IsOn) {
 			return;
 		}
 
@@ -51,59 +69,16 @@ public class Player : LivingEntity {
 		Vector3 moveVelocity = moveInput.normalized * moveSpeed;
 		controller.Move (moveVelocity);
 
-		Ray ray = viewCamera.ScreenPointToRay (Input.mousePosition);
-		Plane groundPlane = new Plane (Vector3.up, Vector3.up * gunController.GunHeight);
-		float rayDistance;
-		Vector3 point = Vector3.zero;
-		if (groundPlane.Raycast (ray, out rayDistance)) {
-			point = ray.GetPoint (rayDistance);
-			//Debug.DrawLine(ray.origin,point,Color.red);
-			crosshairs.DetectTargets (ray);
-			LookAtTarget (point);
-		}
-
-		// Weapon input
-		if (Input.GetMouseButton(0)) {
-			if (aimbot) {
-				// Look input
-				int enemyLayer = 1 << LayerMask.NameToLayer ("Enemy");
-				float minDist = Mathf.Infinity;
-				Vector3 closest = point;
-				foreach (Collider hit in Physics.OverlapSphere (transform.position, 10f, enemyLayer)) {
-					float dist = Vector3.Distance (hit.transform.position, transform.position);
-					if (dist < minDist) {
-						minDist = dist;
-						closest = hit.transform.position;
-					}
-				}
-				crosshairs.DetectTargets (!point.Equals (closest));
-				LookAtTarget (closest);
-			}
-			gunController.CmdOnTriggerHold();
-		}
-		if (Input.GetMouseButtonUp(0)) {
-			gunController.CmdOnTriggerRelease();
-		}
-		if (Input.GetKeyDown (KeyCode.R)) {
-			gunController.CmdReload();
-		}
-		if (devMode) {
-			if(Input.GetKeyDown (KeyCode.G)) aimbot = !aimbot;
-			if (Input.GetKeyDown (KeyCode.H)) Heal (startingHealth);
+		if (GameManager.instance.devMode) {
+			if (Input.GetKeyDown (KeyCode.H)) 
+				Heal (startingHealth);
 		}
 	}
 
 	void OnNewWave(int waveNumber) {
 		if (waveNumber != 1) startingHealth = (int)(startingHealth * 1.2f);
-		health = startingHealth;
+		Heal (startingHealth);
 		gunController.CmdEquipGun (waveNumber - 1);
-	}
-
-	void LookAtTarget (Vector3 point) {
-		controller.LookAt (point);
-		crosshairs.transform.position = point;
-		if((new Vector2(point.x, point.z) - new Vector2(transform.position.x, transform.position.z)).sqrMagnitude > 1)
-			gunController.Aim (point);
 	}
 
 	public Gun getGun() {
@@ -117,5 +92,82 @@ public class Player : LivingEntity {
 	public override void Die () {
 		AudioManager.instance.PlaySound ("Player Death", transform.position);
 		base.Die ();
+
+		//Disable components
+		for (int i = 0; i < disableOnDeath.Length; i++) {
+			disableOnDeath[i].enabled = false;
+		}
+
+		//Disable GameObjects
+		for (int i = 0; i < disableGameObjectsOnDeath.Length; i++) {
+			disableGameObjectsOnDeath[i].SetActive(false);
+		}
+
+		//Disable the collider
+		Collider _col = GetComponent<Collider>();
+		if (_col != null)
+			_col.enabled = false;
+
+		//Spawn a death effect
+		GameObject _gfxIns = (GameObject)Instantiate(Resources.Load("Explosion"), transform.position, Quaternion.identity);
+		Destroy(_gfxIns, 3f);
+
+		//Switch cameras
+		if (isLocalPlayer) {
+			GameManager.instance.SetSceneCameraActive(true);
+			//GetComponent<PlayerSetup>().playerUI.SetActive(false);
+		}
+
+		Debug.Log(transform.name + " is DEAD!");
+	}
+
+	public void Respawn() {
+		StartCoroutine (_Respawn());
+	}
+
+	private IEnumerator _Respawn () {
+		yield return new WaitForSeconds(GameManager.instance.matchSettings.respawnTime);
+
+		Transform _spawnPoint = NetworkManager.singleton.GetStartPosition();
+		transform.position = _spawnPoint.position;
+		transform.rotation = _spawnPoint.rotation;
+
+		yield return new WaitForSeconds(0.1f);
+
+		SetupPlayer();
+
+		Debug.Log(transform.name + " respawned.");
+	}
+
+	public void SetDefaults (){
+		dead = false;
+
+		startingHealth = 80;
+		health = startingHealth;
+
+		gunController = GetComponent<GunController> ();
+		SyncManager.instance.OnNewWave += OnNewWave;
+		Spawner spawner = FindObjectOfType<Spawner> ();
+		spawner.setPlayer = this;
+		FindObjectOfType<Scoreboard> ().setPlayer = this;
+
+		//Enable the components
+		for (int i = 0; i < disableOnDeath.Length; i++) {
+			disableOnDeath[i].enabled = wasEnabled[i];
+		}
+
+		//Enable the gameobjects
+		for (int i = 0; i < disableGameObjectsOnDeath.Length; i++) {
+			disableGameObjectsOnDeath[i].SetActive(true);
+		}
+
+		//Enable the collider
+		Collider _col = GetComponent<Collider>();
+		if (_col != null)
+			_col.enabled = true;
+
+		//Create spawn effect
+		GameObject _gfxIns = (GameObject)Instantiate(Resources.Load("SpawnEffect"), transform.position, Quaternion.identity);
+		Destroy(_gfxIns, 3f);
 	}
 }

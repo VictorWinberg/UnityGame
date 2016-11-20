@@ -8,18 +8,20 @@ public class GameUI : MonoBehaviour {
 	public Image fadeCanvas;
 	public GameObject gameOverUI;
 
-	private GameManager igm;
+	[SerializeField]
+	GameObject pauseMenu;
+
+	private SyncManager igm;
 
 	public Player setPlayer {
 		set {
 			player = value;
 			player.OnDeath += OnGameOver; 
 			player.OnChangeHealth += OnChangeHealth;
-			OnChangeHealth ();
 		}
 	}
 
-	public GameManager setIGM {
+	public SyncManager setIGM {
 		set {
 			igm = value;
 			spawner = FindObjectOfType<Spawner> ();
@@ -37,10 +39,21 @@ public class GameUI : MonoBehaviour {
 	
 	void Start () {
 		manager = FindObjectOfType<NetworkManagerExt>();
+		Enemy.OnDeathStatic += OnChangeScore;
+	}
+
+	void Update() {
+		if (Input.GetKeyDown (KeyCode.Escape)) {
+			TogglePauseMenu ();
+		}
+	}
+
+	void TogglePauseMenu () {
+		pauseMenu.SetActive(!pauseMenu.activeSelf);
+		PauseMenu.IsOn = pauseMenu.activeSelf;
 	}
 
 	void OnChangeHealth() {
-		scoreUI.text = Scoreboard.score.ToString("D6");
 		float healthPercent = 0;
 		if (player != null) {
 			healthPercent = player._health() / player.startingHealth;
@@ -56,6 +69,10 @@ public class GameUI : MonoBehaviour {
 		waveEnemyCount.text = "Enemies: " + enemyCount + " | Seed: " + igm.seed;
 		StopCoroutine ("AnimateWaveBanner");
 		StartCoroutine ("AnimateWaveBanner");
+	}
+
+	void OnChangeScore() {
+		scoreUI.text = Scoreboard.score.ToString("D6");
 	}
 
 	IEnumerator AnimateWaveBanner () {
@@ -84,10 +101,18 @@ public class GameUI : MonoBehaviour {
 	void OnGameOver () {
 		Cursor.visible = true;
 		StartCoroutine(Fade(Color.clear, new Color(1, 1, 1, .8f), 1));
-		gameOverScore.text = "Score: " + scoreUI.text + "\nSeed: " + FindObjectOfType<GameManager>().seed;
+		gameOverScore.text = "Score: " + scoreUI.text + "\nSeed: " + FindObjectOfType<SyncManager>().seed;
 		scoreUI.gameObject.SetActive (false);
 		healthbar.transform.parent.gameObject.SetActive (false);
 		gameOverUI.SetActive (true);
+	}
+
+	void OnGameStart() {
+		Cursor.visible = false;
+		StartCoroutine(Fade(new Color(1, 1, 1, .8f), Color.clear, 1));
+		scoreUI.gameObject.SetActive (true);
+		healthbar.transform.parent.gameObject.SetActive (true);
+		gameOverUI.SetActive (false);
 	}
 
 	IEnumerator Fade(Color from, Color to, float time) {
@@ -102,6 +127,11 @@ public class GameUI : MonoBehaviour {
 	}
 
 	// UI Input
+	public void Respawn() {
+		OnGameStart ();
+		player.Respawn ();
+	}
+
 	public void StartNewGame() {
 		SceneManager.LoadScene ("Game");
 	}

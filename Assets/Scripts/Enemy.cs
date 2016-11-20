@@ -47,8 +47,8 @@ public class Enemy : LivingEntity {
 		}
 	}
 
-	protected override void Start () {
-		base.Start ();
+	protected void Start () {
+		Heal (startingHealth);
 		Freeze (isFreeze);
 
 		if (hasTarget) {
@@ -106,7 +106,7 @@ public class Enemy : LivingEntity {
 		}
 
 		if (transform.position.y < -10) {
-			TakeDamage (health);
+			RpcTakeDamage (health);
 		}
 	}
 
@@ -128,7 +128,7 @@ public class Enemy : LivingEntity {
 
 			if(percent >= 0.5f && !hasAppliedDamage) {
 				hasAppliedDamage = true;
-				targetEntity.TakeDamage(damage);
+				targetEntity.RpcTakeDamage(damage);
 			}
 			percent += Time.deltaTime * attackSpeed;
 			float interpolation = (-Mathf.Pow(percent,2) + percent) * 4;
@@ -156,6 +156,11 @@ public class Enemy : LivingEntity {
 			}
 			yield return new WaitForSeconds(refreshRate);
 		}
+	}
+
+	public override void Die () {
+		base.Die ();
+		GameObject.Destroy (gameObject);
 	}
 
 	public void Freeze(bool freeze) {
