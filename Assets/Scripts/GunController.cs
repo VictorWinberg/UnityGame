@@ -17,11 +17,18 @@ public class GunController : NetworkBehaviour {
 	void Start() {
 		viewCamera = Camera.main;
 
-		// Create Crosshairs
-		crosshairs = ((GameObject) Instantiate(Resources.Load("Crosshairs"))).GetComponent<Crosshairs>();
+		SyncManager.instance.OnNewWave += OnNewWave;
+
+		if (isLocalPlayer) {
+			// Create Crosshairs
+			crosshairs = ((GameObject) Instantiate(Resources.Load("Crosshairs"))).GetComponent<Crosshairs>();
+		}
 	}
 
 	void Update() {
+		if(!isLocalPlayer || PauseMenu.IsOn)
+			return;
+
 		Ray ray = viewCamera.ScreenPointToRay (Input.mousePosition);
 		Plane groundPlane = new Plane (Vector3.up, Vector3.up * GunHeight);
 		float rayDistance;
@@ -33,7 +40,7 @@ public class GunController : NetworkBehaviour {
 		}
 
 		// Weapon input
-		if (Input.GetMouseButton(0)) {
+		if (Input.GetButtonDown("Fire1")) {
 			if (GameManager.instance.aimbot) {
 				// Look input
 				int enemyLayer = 1 << LayerMask.NameToLayer ("Enemy");
@@ -51,58 +58,74 @@ public class GunController : NetworkBehaviour {
 			}
 			CmdOnTriggerHold();
 		}
-		if (Input.GetMouseButtonUp(0)) {
+		if (Input.GetButtonUp("Fire1")) {
 			CmdOnTriggerRelease();
 		}
-		if (Input.GetKeyDown (KeyCode.R)) {
+		if (Input.GetButtonDown("Reload")) {
 			CmdReload();
 		}
 	}
 
-	public void EquipGun(Gun gunToEquip) {
+	void OnNewWave(int waveNumber) {
+		CmdEquipGun (waveNumber - 1);
+	}
+
+	void EquipGun(Gun gunToEquip) {
 		if (gun != null) {
 			Destroy(gun.gameObject);
 		}
 		gun = (Gun)Instantiate (gunToEquip, weaponHold.position, weaponHold.rotation);
-		gun.parentNetId = weaponHold.parent.GetComponent<NetworkIdentity> ().netId;
-		gun.transform.parent = weaponHold;
-		NetworkServer.Spawn (gun.gameObject);
+		gun.transform.SetParent (weaponHold);
 	}
 
 	[Command]
-	public void CmdEquipGun(int gunIndex) {
+	void CmdEquipGun(int gunIndex) {
+		RpcEquipGun (gunIndex);
+	}
+
+	[ClientRpc]
+	void RpcEquipGun(int gunIndex) {
 		this.gunIndex = gunIndex;
 		EquipGun (guns [gunIndex % guns.Length]);
 	}
 
 	[Command]
-	public void CmdOnTriggerHold (){
+	void CmdOnTriggerHold (){
+		RpcDoTriggerHold ();
+	}
+
+	[ClientRpc]
+	void RpcDoTriggerHold() {
 		if (gun != null) {
 			gun.OnTriggerHold ();
 		}
 	}
 
 	[Command]
-	public void CmdOnTriggerRelease() {
+	void CmdOnTriggerRelease() {
+		RpcDoTriggerRelease ();
+	}
+
+	[ClientRpc]
+	void RpcDoTriggerRelease () {
 		if (gun != null) {
 			gun.OnTriggerRelease ();
 		}
 	}
 
-	public float GunHeight {
+	float GunHeight {
 		get {
 			return weaponHold.position.y;
 		}
 	}
 
-	public void Aim(Vector3 aimPoint) {
-		if (gun != null) {
-			gun.Aim (aimPoint);
-		}
-	}
-
 	[Command]
 	public void CmdReload() {
+		RpcReload ();
+	}
+
+	[ClientRpc]
+	void RpcReload() {
 		if (gun != null) {
 			gun.Reload ();
 		}
@@ -118,7 +141,5 @@ public class GunController : NetworkBehaviour {
 
 	void LookAtTarget (Vector3 point) {
 		crosshairs.transform.position = point;
-		if((new Vector2(point.x, point.z) - new Vector2(transform.position.x, transform.position.z)).sqrMagnitude > 1)
-			Aim (point);
 	}
 }

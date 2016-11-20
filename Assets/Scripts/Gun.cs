@@ -44,22 +44,11 @@ public class Gun : NetworkBehaviour {
 		reloading = false;
 	}
 
-	[SyncVar(hook="HoldGun")]
-	public NetworkInstanceId parentNetId;
-
-	public void HoldGun(NetworkInstanceId _parentNetId) {
-		parentNetId = _parentNetId;
-		GameObject parentObject = ClientScene.FindLocalObject(parentNetId);
-		transform.SetParent(parentObject.transform.FindChild("Weapon Hold"));
-		transform.localRotation = Quaternion.identity;
-		transform.localPosition = Vector3.zero;
-	}
-
 	void LateUpdate() {
 		// Animate the recoil
 		transform.localPosition = Vector3.SmoothDamp (transform.localPosition, Vector3.zero, ref recoilSmoothDampVelocity, recoilRecoverTime);
 		recoilAngle = Mathf.SmoothDamp (recoilAngle, 0, ref recoilRotationSmoothDampVelocity, recoilRecoverTime);
-		transform.localEulerAngles += Vector3.left * recoilAngle;
+		transform.localEulerAngles = Vector3.left * recoilAngle;
 
 		if (!reloading && bulletsRemainingInMag == 0)
 			Reload ();

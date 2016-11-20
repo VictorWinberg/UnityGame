@@ -4,8 +4,6 @@ using System.Collections;
 
 public class Spawner : NetworkBehaviour {
 
-	public bool devMode;
-
 	public Wave[] waves  { get; private set; }
 	private Enemy enemy;
 
@@ -89,7 +87,7 @@ public class Spawner : NetworkBehaviour {
 			StartCoroutine("SpawnEnemy");
 		}
 
-		if (devMode) {
+		if (GameManager.instance.devMode) {
 			if (Input.GetKeyDown (KeyCode.Return)) {
 				StopCoroutine ("SpawnEnemy");
 				foreach (Enemy enemy in FindObjectsOfType<Enemy>()) {

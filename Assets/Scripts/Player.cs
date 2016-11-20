@@ -78,7 +78,6 @@ public class Player : LivingEntity {
 	void OnNewWave(int waveNumber) {
 		if (waveNumber != 1) startingHealth = (int)(startingHealth * 1.2f);
 		Heal (startingHealth);
-		gunController.CmdEquipGun (waveNumber - 1);
 	}
 
 	public Gun getGun() {

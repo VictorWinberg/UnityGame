@@ -6,7 +6,6 @@ using System.Collections;
 public class NetworkManagerExt : NetworkManager {
 
 	public static int waves = 30;
-	public bool devMode;
 
 	private MapGenerator map;
 	private Spawner spawner;
@@ -14,7 +13,6 @@ public class NetworkManagerExt : NetworkManager {
 	private bool preview = true;
 
 	void Awake() {
-		devMode = true;
 		setPreview (preview);
 	}
 
@@ -24,22 +22,28 @@ public class NetworkManagerExt : NetworkManager {
 		setPreview(false);
 	}
 
-	public override void OnStartHost (){
-		base.OnStartHost ();
-		Debug.Log ("OnStartHost");
-		setPreview(false);
-	}
-
 	public override void OnStopClient () {
 		base.OnStopClient ();
 		Debug.Log ("OnStopClient");
 		setPreview(true);
 	}
 
-	public override void OnStopHost () {
-		base.OnStopHost ();
-		Debug.Log ("OnStopHost");
-		setPreview(true);
+	public override void OnMatchCreate (bool success, string extendedInfo, UnityEngine.Networking.Match.MatchInfo matchInfo) {
+		base.OnMatchCreate (success, extendedInfo, matchInfo);
+		Debug.Log ("OnMatchCreate");
+		setPreview(false);
+	}
+
+	public override void OnMatchJoined (bool success, string extendedInfo, UnityEngine.Networking.Match.MatchInfo matchInfo) {
+		base.OnMatchJoined (success, extendedInfo, matchInfo);
+		Debug.Log ("OnMatchJoined");
+		setPreview(false);
+	}
+
+	public override void OnDestroyMatch (bool success, string extendedInfo) {
+		base.OnDestroyMatch (success, extendedInfo);
+		Debug.Log ("OnDestroyMatch");
+		setPreview(false);
 	}
 
 	float starttime = 3f;
