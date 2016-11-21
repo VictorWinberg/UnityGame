@@ -1,7 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 
-/* Identical to MultiplayerFPS */
 public class GameManager : MonoBehaviour {
 
 	public static GameManager instance;

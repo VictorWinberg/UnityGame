@@ -18,6 +18,7 @@ public class GunController : NetworkBehaviour {
 		viewCamera = Camera.main;
 
 		SyncManager.instance.OnNewWave += OnNewWave;
+		GetComponent<Player> ().OnDeath += OnPlayerDeath;
 
 		if (isLocalPlayer) {
 			// Create Crosshairs
@@ -64,18 +65,28 @@ public class GunController : NetworkBehaviour {
 		if (Input.GetButtonDown("Reload")) {
 			CmdReload();
 		}
+		if (GameManager.instance.devMode) {
+			if (Input.GetKeyDown (KeyCode.F))
+				GameManager.instance.aimbot = !GameManager.instance.aimbot;
+		}
 	}
 
 	void OnNewWave(int waveNumber) {
 		CmdEquipGun (waveNumber - 1);
 	}
 
+	void OnPlayerDeath() {
+		CmdEquipGun (-1);
+	}
+
 	void EquipGun(Gun gunToEquip) {
-		if (gun != null) {
+		if (gun != null)
 			Destroy(gun.gameObject);
+		
+		if (gunToEquip != null) {
+			gun = (Gun)Instantiate (gunToEquip, weaponHold.position, weaponHold.rotation);
+			gun.transform.SetParent (weaponHold);
 		}
-		gun = (Gun)Instantiate (gunToEquip, weaponHold.position, weaponHold.rotation);
-		gun.transform.SetParent (weaponHold);
 	}
 
 	[Command]
@@ -86,7 +97,11 @@ public class GunController : NetworkBehaviour {
 	[ClientRpc]
 	void RpcEquipGun(int gunIndex) {
 		this.gunIndex = gunIndex;
-		EquipGun (guns [gunIndex % guns.Length]);
+		if (gunIndex == -1)
+			EquipGun (null);
+		else {
+			EquipGun (guns [gunIndex % guns.Length]);
+		}
 	}
 
 	[Command]

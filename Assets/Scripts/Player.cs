@@ -9,17 +9,9 @@ public class Player : LivingEntity {
 	public float moveSpeed = 5;
 
 	PlayerController controller;
-	GunController gunController;
-
-	[SerializeField]
-	private Behaviour[] disableOnDeath;
-	private bool[] wasEnabled;
-
-	[SerializeField]
-	private GameObject[] disableGameObjectsOnDeath;
 
 	private bool firstSetup = true;
-	private bool aimbot = false;
+	public bool spawned { get; private set; }
 
 	public void SetupPlayer () {
 		if (isLocalPlayer) {
@@ -39,15 +31,11 @@ public class Player : LivingEntity {
 	[ClientRpc]
 	private void RpcSetupPlayerOnAllClients () {
 		if (firstSetup) {
-			wasEnabled = new bool[disableOnDeath.Length];
-			for (int i = 0; i < wasEnabled.Length; i++) {
-				wasEnabled[i] = disableOnDeath[i].enabled;
-			}
-
+			EnableComponents (false);
 			firstSetup = false;
+		} else {
+			SetDefaults ();
 		}
-
-		SetDefaults();
 	}
 
 	// TODO: Fix
@@ -57,6 +45,10 @@ public class Player : LivingEntity {
 
 	void Start() {
 		controller = GetComponent<PlayerController> ();
+		SyncManager.instance.OnNewWave += OnNewWave;
+		Spawner spawner = FindObjectOfType<Spawner> ();
+		spawner.setPlayer = this;
+		FindObjectOfType<Scoreboard> ().setPlayer = this;
 	}
 
 	void Update () {
@@ -76,36 +68,20 @@ public class Player : LivingEntity {
 	}
 
 	void OnNewWave(int waveNumber) {
-		if (waveNumber != 1) startingHealth = (int)(startingHealth * 1.2f);
+		startingHealth = (int)(startingHealth * 1.2f);
 		Heal (startingHealth);
-	}
 
-	public Gun getGun() {
-		return gunController.getGun ();
-	}
-
-	public Gun getGunWithIndex(int gunIndex) {
-		return gunController.getGunWithIndex (gunIndex);
+		if (!spawned) {
+			SetupPlayer ();
+			spawned = true;
+		}
 	}
 
 	public override void Die () {
 		AudioManager.instance.PlaySound ("Player Death", transform.position);
 		base.Die ();
 
-		//Disable components
-		for (int i = 0; i < disableOnDeath.Length; i++) {
-			disableOnDeath[i].enabled = false;
-		}
-
-		//Disable GameObjects
-		for (int i = 0; i < disableGameObjectsOnDeath.Length; i++) {
-			disableGameObjectsOnDeath[i].SetActive(false);
-		}
-
-		//Disable the collider
-		Collider _col = GetComponent<Collider>();
-		if (_col != null)
-			_col.enabled = false;
+		EnableComponents (false);
 
 		//Spawn a death effect
 		GameObject _gfxIns = (GameObject)Instantiate(Resources.Load("Explosion"), transform.position, Quaternion.identity);
@@ -114,7 +90,6 @@ public class Player : LivingEntity {
 		//Switch cameras
 		if (isLocalPlayer) {
 			GameManager.instance.SetSceneCameraActive(true);
-			//GetComponent<PlayerSetup>().playerUI.SetActive(false);
 		}
 
 		Debug.Log(transform.name + " is DEAD!");
@@ -133,7 +108,13 @@ public class Player : LivingEntity {
 
 		yield return new WaitForSeconds(0.1f);
 
-		SetupPlayer();
+		if (isLocalPlayer) {
+			//Switch cameras
+			GameManager.instance.SetSceneCameraActive(false);
+			GetComponent<PlayerSetup>().gameUI.SetActive(true);
+		}
+
+		spawned = false;
 
 		Debug.Log(transform.name + " respawned.");
 	}
@@ -144,29 +125,31 @@ public class Player : LivingEntity {
 		startingHealth = 80;
 		health = startingHealth;
 
-		gunController = GetComponent<GunController> ();
-		SyncManager.instance.OnNewWave += OnNewWave;
-		Spawner spawner = FindObjectOfType<Spawner> ();
-		spawner.setPlayer = this;
-		FindObjectOfType<Scoreboard> ().setPlayer = this;
-
-		//Enable the components
-		for (int i = 0; i < disableOnDeath.Length; i++) {
-			disableOnDeath[i].enabled = wasEnabled[i];
-		}
-
-		//Enable the gameobjects
-		for (int i = 0; i < disableGameObjectsOnDeath.Length; i++) {
-			disableGameObjectsOnDeath[i].SetActive(true);
-		}
-
-		//Enable the collider
-		Collider _col = GetComponent<Collider>();
-		if (_col != null)
-			_col.enabled = true;
+		EnableComponents (true);
 
 		//Create spawn effect
 		GameObject _gfxIns = (GameObject)Instantiate(Resources.Load("SpawnEffect"), transform.position, Quaternion.identity);
 		Destroy(_gfxIns, 3f);
+	}
+
+	private void EnableComponents(bool enabled) {
+		
+		//Enable the collider
+		Collider _col = GetComponent<Collider>();
+		if (_col != null)
+			_col.enabled = enabled;
+
+		//Enable the rigidbody
+		Rigidbody _rig = GetComponent<Rigidbody>();
+		if (_rig != null) {
+			_rig.detectCollisions = enabled;
+			_rig.isKinematic = !enabled;
+		}
+
+		//Enable the mesh renderer
+		MeshRenderer renderer = GetComponent<MeshRenderer>();
+		Color c = renderer.material.color;
+		renderer.material.shader = Shader.Find( "Transparent/Diffuse" );
+		renderer.material.color = enabled ? new Color (c.r, c.g, c.b, 1f) : new Color (c.r, c.g, c.b, 0.5f);
 	}
 }

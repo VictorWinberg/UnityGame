@@ -10,7 +10,7 @@ public abstract class LivingEntity : NetworkBehaviour, IDamageable {
 	[SyncVar(hook = "ChangeHealth")]
 	protected float health;
 
-	protected bool dead;
+	public bool dead { get; protected set; }
 
 	public event System.Action OnDeath, OnChangeHealth;
 

@@ -35,36 +35,21 @@ public class Enemy : LivingEntity {
 	void Awake() {
 		pathfinder = GetComponent<NavMeshAgent> ();
 		angularSpeed = pathfinder.angularSpeed;
-		
-		if (GameObject.FindGameObjectWithTag ("Player") != null) {
-			hasTarget = true;
-
-			target = GameObject.FindGameObjectWithTag ("Player").transform;
-			targetEntity = target.GetComponent<LivingEntity> ();
-			
-			myCollisionRadius = GetComponent<CapsuleCollider> ().radius;
-			targetCollisionRadius = target.GetComponent<CapsuleCollider> ().radius;
-		}
 	}
 
 	protected void Start () {
 		Heal (startingHealth);
 		Freeze (isFreeze);
 
-		if (hasTarget) {
-			currentState = State.Chasing;
-
-			targetEntity.OnDeath += OnTargetDeath;
-			
-			StartCoroutine (UpdatePath ());
-		}
+		FindTarget ();
+		StartCoroutine (UpdatePath ());
 	}
 
 	public void SetCharacteristics (float moveSpeed, int damage, float health, Color skinColor){
 		this.moveSpeed = moveSpeed;
 		pathfinder.speed = moveSpeed;
 
-		if (hasTarget) this.damage = damage;
+		this.damage = damage;
 		startingHealth = health;
 
 		deathEffect.startColor = new Color (skinColor.r, skinColor.g, skinColor.b, 1);
@@ -88,12 +73,14 @@ public class Enemy : LivingEntity {
 	void OnTargetDeath() {
 		hasTarget = false;
 		currentState = State.Idle;
+
+		FindTarget ();
 	}
 
 	void Update () {
 		if (!isServer)
 			return;
-		
+
 		if (hasTarget) {
 			if (Time.time > nextAttackTime) {
 				float sqrDstToTarget = (target.position - transform.position).sqrMagnitude;
@@ -138,8 +125,8 @@ public class Enemy : LivingEntity {
 		}
 		
 		skinMaterial.color = originalColour;
-		currentState = State.Chasing;
 		pathfinder.enabled = true;
+		currentState = State.Chasing;
 	}
 
 	// UpdatePath is called once per refreshRate
@@ -150,7 +137,7 @@ public class Enemy : LivingEntity {
 			if (currentState == State.Chasing) {
 				Vector3 dirToTarget = (target.position - transform.position).normalized;
 				Vector3 targetPosition = target.position - dirToTarget * (myCollisionRadius + targetCollisionRadius + attackDistanceThreshold/2);
-				if (!dead) {
+				if (!dead && pathfinder.enabled) {
 					pathfinder.SetDestination (targetPosition);
 				}
 			}
@@ -160,6 +147,8 @@ public class Enemy : LivingEntity {
 
 	public override void Die () {
 		base.Die ();
+		if(targetEntity != null)
+			targetEntity.OnDeath -= OnTargetDeath;
 		GameObject.Destroy (gameObject);
 	}
 
@@ -172,5 +161,42 @@ public class Enemy : LivingEntity {
 			pathfinder.speed = moveSpeed;
 			pathfinder.angularSpeed = angularSpeed;
 		}
+	}
+
+	//TODO: Remove FindGameObjects for optimization
+	private void FindTarget() {
+		GameObject[] players = GameObject.FindGameObjectsWithTag ("Player");
+
+		if (players.Length > 0) {
+			GameObject closest = GetClosest (players);
+
+			if (closest == null)
+				return;
+			
+			hasTarget = true;
+			currentState = State.Chasing;
+
+			target = closest.transform;
+			targetEntity = target.GetComponent<LivingEntity> ();
+			targetEntity.OnDeath += OnTargetDeath;
+
+			myCollisionRadius = GetComponent<CapsuleCollider> ().radius;
+			targetCollisionRadius = target.GetComponent<CapsuleCollider> ().radius;
+		}
+	}
+
+	private GameObject GetClosest(GameObject[] objects) {
+		GameObject obj = null;
+		float minDist = Mathf.Infinity;
+		Vector3 currentPos = transform.position;
+		foreach (GameObject go in objects) {
+			float dist = Vector3.Distance(go.transform.position, currentPos);
+			Player player = go.GetComponent<Player> ();
+			if (dist < minDist && player.spawned && !player.dead) {
+				obj = go;
+				minDist = dist;
+			}
+		}
+		return obj;
 	}
 }

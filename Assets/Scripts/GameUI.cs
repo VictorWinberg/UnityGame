@@ -55,7 +55,7 @@ public class GameUI : MonoBehaviour {
 
 	void OnChangeHealth() {
 		float healthPercent = 0;
-		if (player != null) {
+		if (player != null && player.startingHealth > 0) {
 			healthPercent = player._health() / player.startingHealth;
 			healthbarHp.text = player._health() + "/" + player.startingHealth;
 		}
@@ -129,6 +129,7 @@ public class GameUI : MonoBehaviour {
 	// UI Input
 	public void Respawn() {
 		OnGameStart ();
+		healthbarHp.text = "Ghost";
 		player.Respawn ();
 	}
 

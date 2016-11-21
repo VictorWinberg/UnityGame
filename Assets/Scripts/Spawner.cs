@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.Networking;
 using System.Collections;
+using System.Collections.Generic;
 
 public class Spawner : NetworkBehaviour {
 
@@ -39,7 +40,7 @@ public class Spawner : NetworkBehaviour {
 			myWaves[i].timeBetweenSpawns = (float)(0.2f + 0.8f * rand.NextDouble());
 
 			myWaves[i].moveSpeed = 2f + 0.2f * i;
-			myWaves[i].damage = (int)(20 * Mathf.Log(i + 3) / (i + 1));
+			myWaves[i].damage = (int)(20 * Mathf.Sqrt(i));
 			myWaves[i].health = (int)(i / 5 + 1);
 			myWaves[i].skinColor = new Color((float)(rand.NextDouble()),(float)(rand.NextDouble()),(float)(rand.NextDouble()));
 		}
@@ -51,6 +52,7 @@ public class Spawner : NetworkBehaviour {
 		isDisabled = true;
 		map = FindObjectOfType<MapGenerator> ();
 		igm = SyncManager.instance;
+		NextWave ();
 	}
 
 	public Player setPlayer {
@@ -64,8 +66,6 @@ public class Spawner : NetworkBehaviour {
 
 			map = FindObjectOfType<MapGenerator> ();
 			igm = FindObjectOfType<SyncManager> ();
-
-			NextWave ();
 		}
 	}
 
@@ -91,7 +91,7 @@ public class Spawner : NetworkBehaviour {
 			if (Input.GetKeyDown (KeyCode.Return)) {
 				StopCoroutine ("SpawnEnemy");
 				foreach (Enemy enemy in FindObjectsOfType<Enemy>()) {
-					GameObject.Destroy (enemy.gameObject);
+					enemy.Die ();
 				}
 				NextWave ();
 			}
@@ -142,7 +142,8 @@ public class Spawner : NetworkBehaviour {
 	}
 
 	void ResetPlayerPosition() {
-		player.transform.position = map.getTileFromPosition(Vector3.zero).position + Vector3.up * 1.5f;
+		if(player != null)
+			player.transform.position = map.getTileFromPosition(Vector3.zero).position + Vector3.up * 1.5f;
 	}
 
 	void NextWave() {
