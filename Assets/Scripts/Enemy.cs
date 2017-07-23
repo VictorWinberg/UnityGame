@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-[RequireComponent (typeof (NavMeshAgent))]
+[RequireComponent (typeof (UnityEngine.AI.NavMeshAgent))]
 public class Enemy : LivingEntity {
 
 	public enum State {Idle, Chasing, Attacking};
@@ -10,7 +10,7 @@ public class Enemy : LivingEntity {
 	public ParticleSystem deathEffect;
 	public static event System.Action OnDeathStatic;
 	
-	NavMeshAgent pathfinder;
+	UnityEngine.AI.NavMeshAgent pathfinder;
 	Transform target;
 	LivingEntity targetEntity;
 	Material skinMaterial;
@@ -26,7 +26,7 @@ public class Enemy : LivingEntity {
 	bool hasTarget;
 
 	void Awake() {
-		pathfinder = GetComponent<NavMeshAgent> ();
+		pathfinder = GetComponent<UnityEngine.AI.NavMeshAgent> ();
 		
 		if (GameObject.FindGameObjectWithTag ("Player") != null) {
 			hasTarget = true;

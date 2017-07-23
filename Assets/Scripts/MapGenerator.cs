@@ -90,8 +90,8 @@ public class MapGenerator : MonoBehaviour {
 
 		// Create mapholder object
 		string holderName = "Generated Map";
-		if (transform.FindChild (holderName)) {
-			DestroyImmediate(transform.FindChild(holderName).gameObject);
+		if (transform.Find (holderName)) {
+			DestroyImmediate(transform.Find(holderName).gameObject);
 		}
 
 		Transform mapHolder = new GameObject (holderName).transform;
