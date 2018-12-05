@@ -6,7 +6,7 @@ public class Spawner : MonoBehaviour {
 	public bool developerMode;
 
 	public Wave[] waves  { get; private set; }
-	private Enemy enemy;
+	public Enemy enemy;
 
 	LivingEntity player;
 

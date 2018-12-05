@@ -26,8 +26,8 @@ public class GameManager : MonoBehaviour {
 	}
 
 	void Start () {
-		player.aimbot = true;
-		player.startingHealth = 100000;
+		player.aimbot = false;
+		//player.startingHealth = 100000;
 	}
 	
 	void Update () {
